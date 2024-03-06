@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   background-color: #012860;
-  color: #fff;
+  color: var(--primary-glow);
   padding: 1rem;
   border-bottom: 5px solid #a8c8ef;
 }
@@ -16,13 +16,13 @@
 .logo a {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #fff;
+  color: var(--primary-glow);
   text-decoration: none;
 }
 
 .links a {
   margin: 0 0.5rem 0 0.5rem;
-  color: #fff;
+  color: var(--primary-glow);
   text-decoration: none;
 }
 
