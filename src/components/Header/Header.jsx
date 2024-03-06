@@ -1,6 +1,6 @@
-import styles from './Header.module.css';
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
+import styles from './Header.module.css';
 
 const Header = () => {
   return (

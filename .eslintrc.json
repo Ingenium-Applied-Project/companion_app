@@ -4,13 +4,24 @@
     "next",
     "prettier",
     "next/core-web-vitals",
-    "eslint:recommended",
     "plugin:storybook/recommended"
   ],
   "globals": {
     "React": "readonly"
   },
-  "plugins": ["validate-filename"],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true,
+    "jest": true
+  },
+  "plugins": ["validate-filename", "react", "storybook"],
   "overrides": [
     {
       "files": ["*.stories.@(ts|tsx|js|jsx|mjs|cjs)"],
@@ -21,6 +32,7 @@
     }
   ],
   "rules": {
+    "react/jsx-pascal-case": ["error", { "allowAllCaps": true, "ignore": [] }],
     "react/no-unescaped-entities": "off",
     "@next/next/no-page-custom-font": "off",
     "no-unused-vars": [
