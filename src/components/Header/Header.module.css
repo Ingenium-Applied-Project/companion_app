@@ -1,0 +1,31 @@
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #012860;
+  color: var(--primary-glow);
+  padding: 1rem;
+  border-bottom: 5px solid #a8c8ef;
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.logo a {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-glow);
+  text-decoration: none;
+}
+
+.links a {
+  margin: 0 0.5rem 0 0.5rem;
+  color: var(--primary-glow);
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}

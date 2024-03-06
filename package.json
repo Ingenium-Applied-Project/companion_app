@@ -6,15 +6,33 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prettier": "prettier --write .",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "resolutions": {
+    "webpack": "^5"
   },
   "dependencies": {
+    "next": "14.1.2",
     "react": "^18",
-    "react-dom": "^18",
-    "next": "14.1.2"
+    "react-dom": "^18"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "^7.6.17",
+    "@storybook/addon-interactions": "^7.6.17",
+    "@storybook/addon-links": "^7.6.17",
+    "@storybook/addon-onboarding": "^1.0.11",
+    "@storybook/blocks": "^7.6.17",
+    "@storybook/nextjs": "^7.6.17",
+    "@storybook/react": "^7.6.17",
+    "@storybook/test": "^7.6.17",
     "eslint": "^8",
-    "eslint-config-next": "14.1.2"
+    "eslint-config-next": "14.1.2",
+    "eslint-plugin-storybook": "^0.8.0",
+    "eslint-plugin-validate-filename": "^0.0.4",
+    "prettier": "^3.2.5",
+    "storybook": "^7.6.17"
   }
 }
