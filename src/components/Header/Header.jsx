@@ -1,6 +1,6 @@
-import styles from "./Header.module.css";
-import Link from "next/link";
-import Image from "next/image";
+import styles from './Header.module.css';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const Header = () => {
   return (
@@ -12,8 +12,8 @@ const Header = () => {
               src="/inSYNC_logo_transparent.png"
               alt="inSync Logo"
               style={{
-                width: "auto",
-                height: "100%",
+                width: 'auto',
+                height: '100%',
               }}
               width={100}
               height={300}

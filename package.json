@@ -20,6 +20,7 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^14.1.2",
     "@storybook/addon-essentials": "^7.6.17",
     "@storybook/addon-interactions": "^7.6.17",
     "@storybook/addon-links": "^7.6.17",
@@ -30,6 +31,7 @@
     "@storybook/test": "^7.6.17",
     "eslint": "^8",
     "eslint-config-next": "14.1.2",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-storybook": "^0.8.0",
     "eslint-plugin-validate-filename": "^0.0.4",
     "prettier": "^3.2.5",
