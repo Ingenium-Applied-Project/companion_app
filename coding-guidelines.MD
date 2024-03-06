@@ -64,7 +64,7 @@
 
 ## GitHub
 
-1. 
+1.
 
 ## Design - CSS
 
