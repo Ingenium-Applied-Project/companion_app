@@ -1,8 +1,8 @@
-name: 'Netlify Deploy'
+name: 'Netlify Preview Deploy'
 
 on:
-  release:
-    types: ['published']
+  pull_request:
+    types: ['opened', 'edited', 'synchronize']
 
 jobs:
   deploy:
@@ -11,9 +11,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: jsmrcaga/action-netlify-deploy@master
+      - uses: jsmrcaga/action-netlify-deploy@v2.0.0
         with:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          NETLIFY_DEPLOY_MESSAGE: "Prod deploy v${{ github.ref }}"
-          NETLIFY_DEPLOY_TO_PROD: true
