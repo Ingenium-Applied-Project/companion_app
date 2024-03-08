@@ -9,6 +9,10 @@ const AppContext = createContext();
 function AppProvider({ children }) {
   const [currentApp, setCurrentApp] = useState('');
 
+  const [heroImage, setHeroImage] = useState(null);
+  const [modifiedHeroImage, setModifiedHeroImage] = useState(null);
+  const [heroImageUserFilters, setHeroImageUserFilters] = useState({});
+
   useEffect(() => {
     // Log for testing purposes. Remove before deploying to production.
     console.log('Inside AppProvider');
@@ -18,6 +22,32 @@ function AppProvider({ children }) {
   const getAppConfiguration = (payload) => {
     const { app = '' } = payload;
   };
+
+  // Hero Image functions - Start
+  // Uploaded hero image is stored in the context.
+  const setHeroSourceImage = async (payload) => {
+    // TODO:
+    // 1. Set the state
+    // 2. Save it to local storage
+    // 3. Apply filters with the existing parameters
+    // 4. Generate the modified image
+  };
+
+  // Removes the hero image that was previously uploaded
+  const removeHeroSourceImage = async (payload) => {
+    // TODO:
+    // 1. Reset the state
+    // 2. Reset the local storage
+    // 3. Reset the modified image.
+  };
+
+  const applyFiltersToHeroImage = async (payload) => {
+    // TODO:
+    // 1. Apply filter to the hero image and replace the modified one
+    // 2. Save the current filter settings in the local storage
+  };
+
+  // Hero Image functions - End
 
   return (
     <AppContext.Provider value={{ getAppConfiguration }}>
