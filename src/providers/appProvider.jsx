@@ -25,7 +25,22 @@ function AppProvider({ children }) {
 
   // Hero Image functions - Start
   // Uploaded hero image is stored in the context.
+  // {image: e.target.files[0]}
   const setHeroSourceImage = async (payload) => {
+    const { image = '' } = payload;
+    if (!image) return;
+
+    try {
+      const sourceImage = URL.createObjectURL(image);
+
+      setHeroImage(sourceImage);
+
+      try {
+      } catch (error) {}
+    } catch (error) {
+      return;
+    }
+
     // TODO:
     // 1. Set the state
     // 2. Save it to local storage
@@ -50,7 +65,16 @@ function AppProvider({ children }) {
   // Hero Image functions - End
 
   return (
-    <AppContext.Provider value={{ getAppConfiguration }}>
+    <AppContext.Provider
+      value={{
+        getAppConfiguration,
+        heroImage,
+        modifiedHeroImage,
+        setHeroSourceImage,
+        removeHeroSourceImage,
+        applyFiltersToHeroImage,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );
