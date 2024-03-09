@@ -1,5 +1,7 @@
 'use client';
 
+import { LocalStorageKeys } from '@/constants/constants';
+import { storeData } from '@/utils/asyncStorage';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 // Create a context for the app
@@ -9,14 +11,34 @@ const AppContext = createContext();
 function AppProvider({ children }) {
   const [currentApp, setCurrentApp] = useState('');
 
+  //hero source image
   const [heroImage, setHeroImage] = useState(null);
-  const [modifiedHeroImage, setModifiedHeroImage] = useState(null);
-  const [heroImageUserFilters, setHeroImageUserFilters] = useState({});
+  const [heroImageText, setHeroImageText] = useState('');
+
+  //hero modified image and the filters
+  const [modifiedHeroImage, setModifiedHeroImage] = useState({
+    image: null,
+    filters: {
+      gradientStartHeight: 0.5,
+      gradientEndHeight: 1,
+      gradientStartColor: 'rgba(0,0,0,0)',
+      gradientEndColor: 'rgba(0,0,0,1)',
+      fillRectHeight: 0.8,
+      exportQuality: 0.95,
+      defaultExportFormat: 'image/jpeg',
+    },
+  });
 
   useEffect(() => {
     // Log for testing purposes. Remove before deploying to production.
     console.log('Inside AppProvider');
   }, []);
+
+  useEffect(() => {
+    console.log(
+      'Hero image is changed. Apply filters and update the modified image'
+    );
+  }, [heroImage]);
 
   // returns app configuration based on given app name. Blank value would return current app config.
   const getAppConfiguration = (payload) => {
@@ -24,6 +46,21 @@ function AppProvider({ children }) {
   };
 
   // Hero Image functions - Start
+
+  const readHeroImageFromLocalStorage = async () => {
+    //TODO: read
+  };
+
+  const getHeroImageLocalStorageObject = (payload) => {
+    const {
+      sourceImage = null,
+      modifiedImage = null,
+      filters = null,
+    } = payload;
+
+    return { sourceImage, modifiedImage, filters };
+  };
+
   // Uploaded hero image is stored in the context.
   // {image: e.target.files[0]}
   const setHeroSourceImage = async (payload) => {
@@ -33,19 +70,24 @@ function AppProvider({ children }) {
     try {
       const sourceImage = URL.createObjectURL(image);
 
-      setHeroImage(sourceImage);
-
       try {
-      } catch (error) {}
+        const localStorageObject = getHeroImageLocalStorageObject({
+          sourceImage,
+          modifiedImage: modifiedHeroImage.image,
+          filter: modifiedHeroImage.filter,
+        });
+        await storeData(LocalStorageKeys.HERO_IMAGE, localStorageObject);
+      } catch (error) {
+        console.error(
+          'setHeroSourceImage problem at saving data into local storage',
+          error
+        );
+      }
+
+      setHeroImage(sourceImage);
     } catch (error) {
       return;
     }
-
-    // TODO:
-    // 1. Set the state
-    // 2. Save it to local storage
-    // 3. Apply filters with the existing parameters
-    // 4. Generate the modified image
   };
 
   // Removes the hero image that was previously uploaded
@@ -62,6 +104,10 @@ function AppProvider({ children }) {
     // 2. Save the current filter settings in the local storage
   };
 
+  const downloadModifiedHeroImage = async () => {
+    //TODO:
+  };
+
   // Hero Image functions - End
 
   return (
@@ -69,8 +115,10 @@ function AppProvider({ children }) {
       value={{
         getAppConfiguration,
         heroImage,
+        heroImageText,
         modifiedHeroImage,
         setHeroSourceImage,
+        setHeroImageText,
         removeHeroSourceImage,
         applyFiltersToHeroImage,
       }}
