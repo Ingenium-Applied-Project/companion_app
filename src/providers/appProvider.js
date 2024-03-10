@@ -2,6 +2,7 @@
 
 import { LocalStorageKeys } from '@/constants/constants';
 import { storeData } from '@/utils/asyncStorage';
+import { produce } from 'immer';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 // Create a context for the app
@@ -12,21 +13,18 @@ function AppProvider({ children }) {
   const [currentApp, setCurrentApp] = useState('');
 
   //hero source image
-  const [heroImage, setHeroImage] = useState(null);
-  const [heroImageText, setHeroImageText] = useState('');
-
-  //hero modified image and the filters
-  const [modifiedHeroImage, setModifiedHeroImage] = useState({
-    image: null,
-    filters: {
-      gradientStartHeight: 0.5,
-      gradientEndHeight: 1,
-      gradientStartColor: 'rgba(0,0,0,0)',
-      gradientEndColor: 'rgba(0,0,0,1)',
-      fillRectHeight: 0.8,
-      exportQuality: 0.95,
-      defaultExportFormat: 'image/jpeg',
-    },
+  const [heroImage, setHeroImage] = useState(null); //original image
+  const [heroImageText, setHeroImageText] = useState(''); // user's text (overlay)
+  const [modifiedHeroImage, setModifiedHeroImage] = useState(); //modified image
+  const [heroImageFilters, setHeroImageFilters] = useState({
+    // filters
+    gradientStartHeight: 0.5,
+    gradientEndHeight: 1,
+    gradientStartColor: 'rgba(0,0,0,0)',
+    gradientEndColor: 'rgba(0,0,0,1)',
+    fillRectHeight: 0.8,
+    exportQuality: 0.95,
+    defaultExportFormat: 'image/jpeg',
   });
 
   useEffect(() => {
@@ -34,11 +32,24 @@ function AppProvider({ children }) {
     console.log('Inside AppProvider');
   }, []);
 
+  /**
+    When the hero image is changed (e.g. upload or from local storage), filters are applied automatically and the modified image is generated.
+   */
   useEffect(() => {
-    console.log(
-      'Hero image is changed. Apply filters and update the modified image'
-    );
+    const modifyHeroImage = async () => {
+      await applyFiltersToHeroImage();
+    };
+    modifyHeroImage();
   }, [heroImage]);
+
+  useEffect(() => {
+    const modifyHeroImage = async () => {
+      // await applyFiltersToHeroImage();
+    };
+    modifyHeroImage();
+    console.clear();
+    console.log(heroImageFilters);
+  }, [heroImageFilters]);
 
   // returns app configuration based on given app name. Blank value would return current app config.
   const getAppConfiguration = (payload) => {
@@ -58,35 +69,44 @@ function AppProvider({ children }) {
       filters = null,
     } = payload;
 
-    return { sourceImage, modifiedImage, filters };
+    const returnObj = {
+      sourceImage: sourceImage,
+      modifiedImage: modifiedImage,
+      filters: filters,
+    };
+
+    return returnObj;
   };
 
   // Uploaded hero image is stored in the context.
   // {image: e.target.files[0]}
   const setHeroSourceImage = async (payload) => {
-    const { image = '' } = payload;
+    const { image = null } = payload;
+
     if (!image) return;
+    let sourceImage = null;
 
     try {
-      const sourceImage = URL.createObjectURL(image);
-
-      try {
-        const localStorageObject = getHeroImageLocalStorageObject({
-          sourceImage,
-          modifiedImage: modifiedHeroImage.image,
-          filter: modifiedHeroImage.filter,
-        });
-        await storeData(LocalStorageKeys.HERO_IMAGE, localStorageObject);
-      } catch (error) {
-        console.error(
-          'setHeroSourceImage problem at saving data into local storage',
-          error
-        );
-      }
-
+      sourceImage = URL.createObjectURL(image);
       setHeroImage(sourceImage);
     } catch (error) {
-      return;
+      console.error(error);
+    }
+
+    try {
+      if (sourceImage) {
+        const localStorageObject = getHeroImageLocalStorageObject({
+          sourceImage: sourceImage,
+          modifiedImage: modifiedHeroImage,
+          filters: heroImageFilters,
+        });
+        await storeData(LocalStorageKeys.HERO_IMAGE, localStorageObject);
+      }
+    } catch (error) {
+      console.error(
+        'setHeroSourceImage problem at saving data into local storage',
+        error
+      );
     }
   };
 
@@ -98,10 +118,113 @@ function AppProvider({ children }) {
     // 3. Reset the modified image.
   };
 
+  const updateHeroFilterValue = async (payload) => {
+    const { name = '', value = 0 } = payload;
+
+    const newFilters = produce(heroImageFilters, (draft) => {
+      switch (name.toLowerCase()) {
+        case 'gradientStartHeight'.toLowerCase():
+          draft.gradientStartHeight = value / 100 || 0.5;
+          break;
+        case 'gradientEndHeight'.toLowerCase():
+          draft.gradientEndHeight = value / 100 || 1;
+          break;
+        case 'gradientStartColor'.toLowerCase():
+          draft.gradientStartColor = value || 'rgba(0,0,0,0)';
+          break;
+        case 'gradientEndColor'.toLowerCase():
+          draft.gradientEndColor = value || 'rgba(0,0,0,1)';
+          break;
+        case 'fillRectHeight'.toLowerCase():
+          draft.fillRectHeight = value / 100 || 0.8;
+          break;
+        case 'exportQuality'.toLowerCase():
+          draft.exportQuality = value / 100 || 0.95;
+          break;
+        default:
+          break;
+      }
+    });
+
+    setHeroImageFilters(newFilters);
+  };
+
   const applyFiltersToHeroImage = async (payload) => {
+    // always use the
     // TODO:
     // 1. Apply filter to the hero image and replace the modified one
     // 2. Save the current filter settings in the local storage
+
+    if (!heroImage) {
+      setModifiedHeroImage(null);
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const image = new Image();
+    image.src = heroImage;
+
+    image.onload = () => {
+      const height = image.height;
+      const width = image.width;
+      canvas.width = width;
+      canvas.height = height;
+
+      // Draw the original image
+      ctx.drawImage(image, 0, 0, width, height);
+
+      // Adjust gradient to cover the last 35% of the image height
+
+      const gradientStart =
+        height * (heroImageFilters.gradientStartHeight || 0.5);
+      const gradientEnd = height * (heroImageFilters.gradientEndHeight || 1.0);
+
+      // Create a gradient
+      const gradient = ctx.createLinearGradient(
+        0,
+        gradientStart,
+        0,
+        gradientEnd
+      );
+
+      gradient.addColorStop(0, heroImageFilters.gradientStartColor);
+      gradient.addColorStop(1, heroImageFilters.gradientEndColor);
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(
+        0,
+        gradientStart,
+        width,
+        height * (heroImageFilters.fillRectHeight || 0.8)
+      ); // Fill the last 35%
+
+      const quality = heroImageFilters.exportQuality || 0.95;
+
+      // Convert canvas to image source
+      const fileExtension = heroImage
+        .split('.')
+        .pop()
+        .split('?')[0]
+        .toLowerCase(); // Handles URLs with parameters and ensures lowercase
+      let imageFormat;
+      switch (fileExtension) {
+        case 'png':
+          imageFormat = 'image/png';
+          break;
+        case 'jpeg':
+        case 'jpg':
+          imageFormat = 'image/jpeg';
+          break;
+        case 'webp':
+          imageFormat = 'image/webp';
+          break;
+        default:
+          imageFormat = heroImageFilters.defaultExportFormat; // Fallback to JPEG if the format is not recognized
+      }
+      const modifiedSrc = canvas.toDataURL(imageFormat, quality);
+      setModifiedHeroImage(modifiedSrc);
+    };
   };
 
   const downloadModifiedHeroImage = async () => {
@@ -117,6 +240,8 @@ function AppProvider({ children }) {
         heroImage,
         heroImageText,
         modifiedHeroImage,
+        heroImageFilters,
+        updateHeroFilterValue,
         setHeroSourceImage,
         setHeroImageText,
         removeHeroSourceImage,
