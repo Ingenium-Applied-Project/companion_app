@@ -1,7 +1,8 @@
 'use client';
 
 import { HeroImageDefaultsCASM, LocalStorageKeys } from '@/constants/constants';
-import { storeData } from '@/utils/asyncStorage';
+import { retrieveData, storeData } from '@/utils/asyncStorage';
+import { isBlobURL } from '@/utils/utils';
 import { produce } from 'immer';
 import { createContext, useContext, useEffect, useState } from 'react';
 
@@ -20,29 +21,18 @@ function AppProvider({ children }) {
     HeroImageDefaultsCASM
   );
 
-  useEffect(() => {
-    // Log for testing purposes. Remove before deploying to production.
-    console.log('Inside AppProvider');
-  }, []);
+  useEffect(() => {}, []);
 
   /**
-    When the hero image is changed (e.g. upload or from local storage), filters are applied automatically and the modified image is generated.
+    When the hero image, or the filters is changed (e.g. user upload),
+     the modified image is re-generated automatically.
    */
   useEffect(() => {
     const modifyHeroImage = async () => {
       await applyFiltersToHeroImage();
     };
     modifyHeroImage();
-  }, [heroImage]);
-
-  useEffect(() => {
-    const modifyHeroImage = async () => {
-      await applyFiltersToHeroImage();
-    };
-    modifyHeroImage();
-    console.clear();
-    console.log(heroImageFilters);
-  }, [heroImageFilters]);
+  }, [heroImage, heroImageFilters]);
 
   // returns app configuration based on given app name. Blank value would return current app config.
   const getAppConfiguration = (payload) => {
@@ -52,19 +42,41 @@ function AppProvider({ children }) {
   // Hero Image functions - Start
 
   const readHeroImageFromLocalStorage = async () => {
-    //TODO: read
+    // TODO: Do not implement this. There is a complexity with local storage and images
+    if (1 === 2) {
+      try {
+        const savedData = await retrieveData(LocalStorageKeys.HERO_IMAGE);
+        console.warn('here', savedData);
+        if (savedData) {
+          const { sourceImage, filters, title = '' } = savedData;
+          if (isBlobURL(sourceImage)) {
+            setHeroImage(sourceImage);
+          } else {
+            setHeroImage(null);
+          }
+          setHeroImageFilters(filters);
+          setHeroImageText(title);
+        } else {
+          setHeroImage(null);
+          setHeroImageFilters(null);
+          setHeroImageText('');
+        }
+      } catch (error) {
+        setHeroImage(null);
+        setModifiedHeroImage(null);
+        setHeroImageText('');
+        console.error(
+          error || 'Error in readHeroImageFromLocalStorage function'
+        );
+      }
+    }
   };
 
   const getHeroImageLocalStorageObject = (payload) => {
-    const {
-      sourceImage = null,
-      modifiedImage = null,
-      filters = null,
-    } = payload;
+    const { sourceImage = null, filters = null } = payload;
 
     const returnObj = {
       sourceImage: sourceImage,
-      modifiedImage: modifiedImage,
       filters: filters,
     };
 
@@ -90,7 +102,7 @@ function AppProvider({ children }) {
       if (sourceImage) {
         const localStorageObject = getHeroImageLocalStorageObject({
           sourceImage: sourceImage,
-          modifiedImage: modifiedHeroImage,
+          // modifiedImage: modifiedHeroImage,
           filters: heroImageFilters,
         });
         await storeData(LocalStorageKeys.HERO_IMAGE, localStorageObject);
@@ -239,16 +251,15 @@ function AppProvider({ children }) {
     <AppContext.Provider
       value={{
         getAppConfiguration,
-        heroImage,
-        heroImageText,
-        modifiedHeroImage,
-        heroImageFilters,
-        updateHeroFilterValue,
-        setHeroSourceImage,
-        setHeroImageText,
-        removeHeroSourceImage,
-        applyFiltersToHeroImage,
-        downloadModifiedHeroImage,
+        heroImage, // Original hero image
+        heroImageText, // Overlay text on the modified image
+        modifiedHeroImage, // Modified version of the hero image (with gradient on it)
+        heroImageFilters, // applied image filters on the hero image (TODO: Remove later)
+        updateHeroFilterValue, // A utility function to update the hero image filters.
+        setHeroSourceImage, // Called from the HeroImage component to set the hero image
+        setHeroImageText, // Called from the Hero image component to set the heroImageText
+        removeHeroSourceImage, // When user deletes the hero image
+        downloadModifiedHeroImage, // When user clicks on "Download" button on the modified hero image
       }}
     >
       {children}
