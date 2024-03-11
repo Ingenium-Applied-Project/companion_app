@@ -54,7 +54,7 @@
           {
             "case": "kebab",
             "target": "**/app/**",
-            "patterns": "^(page|layout|loading|error|not-found|route|template).jsx$"
+            "patterns": "^(page|layout|loading|error|not-found|route|template|providers).jsx$"
           },
           {
             "case": "camel",
