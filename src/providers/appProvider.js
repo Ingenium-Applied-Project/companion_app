@@ -1,6 +1,6 @@
 'use client';
 
-import { LocalStorageKeys } from '@/constants/constants';
+import { HeroImageDefaultsCASM, LocalStorageKeys } from '@/constants/constants';
 import { storeData } from '@/utils/asyncStorage';
 import { produce } from 'immer';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -16,16 +16,9 @@ function AppProvider({ children }) {
   const [heroImage, setHeroImage] = useState(null); //original image
   const [heroImageText, setHeroImageText] = useState(''); // user's text (overlay)
   const [modifiedHeroImage, setModifiedHeroImage] = useState(); //modified image
-  const [heroImageFilters, setHeroImageFilters] = useState({
-    // filters
-    gradientStartHeight: 0.5,
-    gradientEndHeight: 1,
-    gradientStartColor: 'rgba(0,0,0,0)',
-    gradientEndColor: 'rgba(0,0,0,1)',
-    fillRectHeight: 1,
-    exportQuality: 0.95,
-    defaultExportFormat: 'image/jpeg',
-  });
+  const [heroImageFilters, setHeroImageFilters] = useState(
+    HeroImageDefaultsCASM
+  );
 
   useEffect(() => {
     // Log for testing purposes. Remove before deploying to production.
