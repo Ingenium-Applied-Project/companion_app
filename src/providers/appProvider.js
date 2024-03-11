@@ -124,10 +124,10 @@ function AppProvider({ children }) {
     const newFilters = produce(heroImageFilters, (draft) => {
       switch (name.toLowerCase()) {
         case 'gradientStartHeight'.toLowerCase():
-          draft.gradientStartHeight = value / 100 || 0.5;
+          draft.gradientStartHeight = value / 100 || 0;
           break;
         case 'gradientEndHeight'.toLowerCase():
-          draft.gradientEndHeight = value / 100 || 1;
+          draft.gradientEndHeight = value / 100 || 0;
           break;
         case 'gradientStartColor'.toLowerCase():
           draft.gradientStartColor = value || 'rgba(0,0,0,0)';

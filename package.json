@@ -19,6 +19,7 @@
     "immer": "^10.0.3",
     "next": "14.1.2",
     "react": "^18",
+    "react-color": "^2.19.3",
     "react-dom": "^18"
   },
   "devDependencies": {
