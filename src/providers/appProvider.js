@@ -22,7 +22,7 @@ function AppProvider({ children }) {
     gradientEndHeight: 1,
     gradientStartColor: 'rgba(0,0,0,0)',
     gradientEndColor: 'rgba(0,0,0,1)',
-    fillRectHeight: 0.8,
+    fillRectHeight: 1,
     exportQuality: 0.95,
     defaultExportFormat: 'image/jpeg',
   });
@@ -44,7 +44,7 @@ function AppProvider({ children }) {
 
   useEffect(() => {
     const modifyHeroImage = async () => {
-      // await applyFiltersToHeroImage();
+      await applyFiltersToHeroImage();
     };
     modifyHeroImage();
     console.clear();
@@ -136,7 +136,7 @@ function AppProvider({ children }) {
           draft.gradientEndColor = value || 'rgba(0,0,0,1)';
           break;
         case 'fillRectHeight'.toLowerCase():
-          draft.fillRectHeight = value / 100 || 0.8;
+          draft.fillRectHeight = value / 100 || 0;
           break;
         case 'exportQuality'.toLowerCase():
           draft.exportQuality = value / 100 || 0.95;
@@ -188,7 +188,8 @@ function AppProvider({ children }) {
         gradientEnd
       );
 
-      gradient.addColorStop(0, heroImageFilters.gradientStartColor);
+      gradient.addColorStop(0, 'rgba(0,0,0,0)');
+      gradient.addColorStop(0.33, heroImageFilters.gradientStartColor);
       gradient.addColorStop(1, heroImageFilters.gradientEndColor);
 
       ctx.fillStyle = gradient;
@@ -196,7 +197,7 @@ function AppProvider({ children }) {
         0,
         gradientStart,
         width,
-        height * (heroImageFilters.fillRectHeight || 0.8)
+        height * (heroImageFilters.fillRectHeight || 1)
       ); // Fill the last 35%
 
       const quality = heroImageFilters.exportQuality || 0.95;
@@ -228,7 +229,15 @@ function AppProvider({ children }) {
   };
 
   const downloadModifiedHeroImage = async () => {
-    //TODO:
+    // Create a temporary anchor (a) element
+    if (!modifiedHeroImage) return;
+
+    const element = document.createElement('a');
+    element.setAttribute('href', modifiedHeroImage);
+    element.setAttribute('download', 'modified-image.png');
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   // Hero Image functions - End
@@ -246,6 +255,7 @@ function AppProvider({ children }) {
         setHeroImageText,
         removeHeroSourceImage,
         applyFiltersToHeroImage,
+        downloadModifiedHeroImage,
       }}
     >
       {children}

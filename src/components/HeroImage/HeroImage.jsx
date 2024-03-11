@@ -14,6 +14,7 @@ const HeroImage = () => {
     modifiedHeroImage,
     heroImageFilters,
     updateHeroFilterValue,
+    downloadModifiedHeroImage,
   } = useApp();
 
   const [showColorPicker1, setShowColorPicker1] = useState(false);
@@ -24,6 +25,10 @@ const HeroImage = () => {
     if (!event.target.closest('.sketch-picker') && showColorPicker1) {
       setShowColorPicker1(false);
     }
+
+    if (!event.target.closest('.sketch-picker') && showColorPicker2) {
+      setShowColorPicker2(false);
+    }
   };
 
   useEffect(() => {
@@ -31,7 +36,7 @@ const HeroImage = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showColorPicker1]);
+  }, [showColorPicker1, showColorPicker2]);
 
   const handleHeroImageUpload = async (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -83,13 +88,9 @@ const HeroImage = () => {
           className={styles.textInput}
         />
       </div>
-      <div>
-        <p>Step 3</p>
-        <div>View</div>
-      </div>
 
       <div>
-        <p className={styles.title}>Adjust Settings</p>
+        <p className={styles.title}> Step 3 Adjust Settings</p>
 
         <div>
           <label className={styles.label}>Gradient Start Height Pct:</label>
@@ -99,19 +100,6 @@ const HeroImage = () => {
             min="0"
             max="100"
             value={heroImageFilters.gradientStartHeight * 100}
-            onChange={handleFilterChange}
-            className={styles.rangeInput}
-          />
-        </div>
-
-        <div>
-          <label className={styles.label}>Gradient End Height Pct:</label>
-          <input
-            type="range"
-            name="gradientEndHeight"
-            min="0"
-            max="100"
-            value={heroImageFilters.gradientEndHeight * 100}
             onChange={handleFilterChange}
             className={styles.rangeInput}
           />
@@ -141,16 +129,61 @@ const HeroImage = () => {
               <button onClick={() => setShowColorPicker1(false)}>Done</button>
             </div>
           )}
+        </div>
 
+        <div>
+          <label className={styles.label}>Gradient End Color:</label>
+
+          <div
+            className={styles.colorPreview}
+            style={{ backgroundColor: heroImageFilters.gradientEndColor }}
+            onClick={() => setShowColorPicker2(!showColorPicker2)}
+          ></div>
+
+          {showColorPicker2 && (
+            <div className={styles.colorPickerOverlay}>
+              <SketchPicker
+                color={heroImageFilters.gradientEndColor}
+                onChangeComplete={(color) => {
+                  updateHeroFilterValue({
+                    name: 'gradientEndColor',
+                    value: `rgba(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b}, ${color.rgb.a})`,
+                  });
+                  // setShowColorPicker1(false);
+                }}
+              />
+              <button onClick={() => setShowColorPicker2(false)}>Done</button>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className={styles.label}>Export Quality:</label>
           <input
-            type="color"
-            name="gradientStartColor"
-            value={heroImageFilters.gradientStartColor}
+            type="range"
+            name="exportQuality"
+            min="1"
+            max="100"
+            value={heroImageFilters.exportQuality * 100}
             onChange={handleFilterChange}
-            className={styles.colorInput}
+            className={styles.rangeInput}
           />
         </div>
       </div>
+
+      {modifiedHeroImage && (
+        <div className={styles.modifiedImage}>
+          <label className={styles.label}>Modified Image:</label>
+          <img
+            src={modifiedHeroImage}
+            alt="Modified"
+            className={styles.image}
+          />
+          <div className={styles.downloadButton}>
+            <button onClick={downloadModifiedHeroImage}>Download</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -179,49 +212,7 @@ export default HeroImage;
 // <div className={styles.modifiedImageContainer}>
 // <div className={styles.filtersContainer}>
 
-//   <div>
-//     <label className={styles.label}>Gradient End Color:</label>
-//     <input
-//       type="color"
-//       name="gradientEndColor"
-//       value={heroImageFilters.gradientEndColor}
-//       onChange={handleFilterChange}
-//       className={styles.colorInput}
-//     />
-//   </div>
-//   <div>
-//     <label className={styles.label}>Fill Rect Height:</label>
-//     <input
-//       type="range"
-//       name="fillRectHeight"
-//       min="0"
-//       max="100"
-//       value={heroImageFilters.fillRectHeight * 100}
-//       onChange={handleFilterChange}
-//       className={styles.rangeInput}
-//     />
-//   </div>
-//   <div>
-//     <label className={styles.label}>Quality:</label>
-//     <input
-//       type="range"
-//       name="exportQuality"
-//       min="1"
-//       max="100"
-//       value={heroImageFilters.exportQuality * 100}
-//       onChange={handleFilterChange}
-//       className={styles.rangeInput}
-//     />
-//   </div>
 // </div>
-// <div className={styles.modifiedImage}>
-//   {modifiedHeroImage && (
-//     <img
-//       src={modifiedHeroImage}
-//       alt="Modified"
-//       className={styles.image}
-//     />
-//   )}
-// </div>
+
 // <div className={styles.downloadButton}>[Download button]</div>
 // </div>
