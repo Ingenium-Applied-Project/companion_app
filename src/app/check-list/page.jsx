@@ -1,4 +1,4 @@
-import config from '../museumConfig.js';
+import config from '../../museumConfig.js';
 
 function CheckList() {
   return (
