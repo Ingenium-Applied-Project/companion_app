@@ -1,0 +1,212 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 20px;
+}
+
+.textInputContainer {
+  display: flex;
+}
+
+/* Styles for the text input */
+.textInput {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.uploadButtonContainer {
+  display: flex;
+}
+
+.originalImageContainer {
+}
+
+.modifiedImageContainer {
+}
+
+@media only screen and (min-width: 45em) {
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* align-items: flex-start; */
+    /* justify-content: center; */
+    margin: 20px;
+  }
+  .textInputContainer {
+    display: flex;
+    grid-row: 1 / 2;
+    grid-column: 1 / -1;
+  }
+
+  .uploadButtonContainer {
+    grid-row: 2 / 3;
+    grid-column: 1 / -1;
+  }
+
+  .originalImageContainer {
+    grid-row: 3 / 4;
+    grid-column: 1 / 2;
+  }
+
+  .modifiedImageContainer {
+    grid-row: 3 / 4;
+    grid-column: 2 / 3;
+  }
+}
+@media only screen and (min-width: 60em) {
+}
+
+.sourceContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+/* Styles for the file input */
+.fileInput {
+  margin-top: 10px;
+}
+
+/* Styles for the modified image container */
+.modifiedImageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Styles for the filters container */
+.filtersContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* Styles for the modified image */
+.modifiedImage {
+  margin-bottom: 20px;
+}
+
+.image {
+  max-width: 100%;
+  max-height: 487px;
+}
+
+.title {
+  font-size: 1.28rem;
+}
+
+/* Styles for the title */
+.title-2 {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: #ffffff;
+  font-size: 2.8125rem;
+  line-height: 1.11;
+  letter-spacing: -0.01111111em;
+  padding: 10px;
+}
+
+.downloadButton {
+  background-color: #007bff;
+  color: white;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.3s;
+}
+
+.downloadButton:hover {
+  background-color: #0056b3;
+}
+
+/* Styles for the sliders */
+.rangeInput {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #e1e1e1;
+  border-radius: 5px;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rangeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.rangeInput::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.rangeInput::-ms-thumb {
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Styles for the color picker */
+.colorInput {
+  border: none;
+  border-radius: 5px;
+  height: 32px;
+  width: 60px;
+  cursor: pointer;
+}
+
+/* Styles for the labels */
+.label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Styles for each filter container */
+.filtersContainer > div {
+  margin-bottom: 20px;
+}
+
+.colorPreview {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.colorPickerOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
