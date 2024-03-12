@@ -1,5 +1,11 @@
-function HeroImage() {
-  return <div>HeroImage</div>;
+import HeroImage from '@/components/HeroImage/HeroImage';
+
+function HeroImageRoute() {
+  return (
+    <div>
+      <HeroImage />
+    </div>
+  );
 }
 
-export default HeroImage;
+export default HeroImageRoute;
