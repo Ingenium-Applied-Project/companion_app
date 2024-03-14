@@ -119,9 +119,8 @@ function CheckList() {
             </p>
             {Object.entries(item.settings).map(([key, value], innerIndex) => (
               <div key={innerIndex}>
-                <input type="checkbox" />
                 <label>
-                  {' '}
+                  <input type="checkbox" />{' '}
                   {key.replace(key.at(0), key.at(0).toUpperCase())}:{' '}
                   {typeof value === 'object'
                     ? `${value.type} - ${value.name}`

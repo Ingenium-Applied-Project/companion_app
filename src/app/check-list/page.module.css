@@ -67,21 +67,3 @@
     align-self: flex-start;
   }
 }
-
-@media only screen and (min-width: 65em) {
-  .grid {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  .gridCol1 {
-    grid-column: 1 / 2;
-  }
-
-  .gridSeparatorBottom {
-    border-bottom: 0;
-  }
-
-  .gridSeparatorRight.gridFull {
-    border-right: 0.5rem solid #c2c2c2;
-  }
-}
