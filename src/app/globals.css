@@ -105,3 +105,16 @@ a {
     color-scheme: dark;
   }
 }
+
+.grid {
+  display: grid;
+  grid-template-areas: 'header main' 'header main';
+}
+
+.grid > header {
+  grid-area: header;
+}
+
+.grid > main {
+  grid-area: main;
+}

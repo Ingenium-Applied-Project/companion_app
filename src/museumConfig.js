@@ -4,7 +4,7 @@ const config = {
       checkList: {
         content: [
           {
-            type: 'link',
+            type: 'links or buttons section',
             for: 'location',
             settings: {
               screen: 'self', //or could be url: 'self'
@@ -16,7 +16,7 @@ const config = {
             },
           },
           {
-            type: 'text',
+            type: 'text section',
             for: 'highlights',
             settings: {
               title: 'Highlights:',
@@ -24,7 +24,7 @@ const config = {
             },
           },
           {
-            type: 'image gallery',
+            type: 'media gallery section',
             for: 'image-gallery',
             settings: {
               title: 'Image Gallery:',
@@ -32,7 +32,7 @@ const config = {
             },
           },
           {
-            type: 'text',
+            type: 'text section',
             for: 'history',
             settings: {
               title: 'History:',
@@ -40,7 +40,7 @@ const config = {
             },
           },
           {
-            type: 'text',
+            type: 'text section',
             for: 'provenance',
             settings: {
               title: 'Provenance:',
@@ -48,7 +48,7 @@ const config = {
             },
           },
           {
-            type: 'text',
+            type: 'text section',
             for: 'technical-information',
             settings: {
               title: 'Technical Information:',

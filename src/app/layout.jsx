@@ -1,3 +1,4 @@
+import '@fortawesome/fontawesome-free/css/all.css'; // import Font Awesome CSS
 import { Inter } from 'next/font/google';
 import Header from '../components/Header/Header.jsx';
 import './globals.css';
@@ -13,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`grid ${inter.className}`}>
         <Providers>
           <Header />
           <main className="container">{children}</main>
