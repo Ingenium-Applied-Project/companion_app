@@ -25,7 +25,11 @@ function CheckList() {
       <div className={styles.gridSeparator}>
         <h2>Mockup</h2>
         <PhoneMockup>
-          <MockupHeader />
+          <MockupHeader
+            image={'./artifact-canadair.webp'}
+            alt={'Canadair Sabre'}
+            title={'Canadair Sabre'}
+          />
           <div className={styles.contentGrid}>
             <MockupScreenLink
               icon="fa-location-dot"
@@ -49,8 +53,8 @@ function CheckList() {
                 return (
                   <Image
                     key={index}
-                    src="/artifact-canadair.webp"
-                    alt="inSync Logo"
+                    src="./artifact-canadair.webp"
+                    alt="Canadair Sabre"
                     width={300}
                     height={180}
                   />
@@ -87,8 +91,8 @@ function CheckList() {
             </MockupContent>
             <MockupContent>
               <Image
-                src="/artifact-canadair.webp"
-                alt="inSync Logo"
+                src="./artifact-canadair.webp"
+                alt="Canadair Sabre"
                 width={300}
                 height={180}
               />
