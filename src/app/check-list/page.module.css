@@ -80,4 +80,8 @@
   .gridSeparatorBottom {
     border-bottom: 0;
   }
+
+  .gridSeparatorRight.gridFull {
+    border-right: 0.5rem solid #c2c2c2;
+  }
 }
