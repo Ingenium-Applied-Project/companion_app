@@ -1,18 +1,13 @@
 import Image from 'next/image';
 import styles from './MockupHeader.module.css';
 
-function MockupHeader() {
+function MockupHeader({ image, alt, title }) {
   return (
     <div className={styles.mockupHeader}>
       <div className={styles.headerImage}>
-        <Image
-          src="/artifact-canadair.webp"
-          alt="inSync Logo"
-          width={350}
-          height={200}
-        />
+        <Image src={image} alt={alt} width={350} height={200} />
       </div>
-      <h2 className={styles.headerTitle}>Canadair Sabre</h2>
+      <h2 className={styles.headerTitle}>{title}</h2>
     </div>
   );
 }
