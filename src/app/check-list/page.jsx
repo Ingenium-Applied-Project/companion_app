@@ -13,7 +13,9 @@ function CheckList() {
   const arr = [1, 2, 3, 4];
   return (
     <div className={styles.grid}>
-      <div className={styles.gridSeparator}>
+      <div
+        className={`${styles.gridSeparator} ${styles.gridSeparatorBottom} ${styles.gridSeparatorRight} ${styles.gridFull} ${styles.gridCol1}`}
+      >
         <h2>Details</h2>
         <p>
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iste,
@@ -22,8 +24,10 @@ function CheckList() {
           consectetur temporibus! Dolore.
         </p>
       </div>
-      <div className={styles.gridSeparator}>
-        <h2>Mockup</h2>
+      <div
+        className={`${styles.gridSeparator} ${styles.gridSeparatorRight} ${styles.show}`}
+      >
+        <h2 className={`${styles.show} ${styles.title}`}>Mockup</h2>
         <PhoneMockup>
           <MockupHeader
             image={'/artifact-canadair.webp'}
@@ -32,7 +36,7 @@ function CheckList() {
           />
           <div className={styles.contentGrid}>
             <MockupScreenLink
-              icon="fa-location-dot"
+              icon={`fa-${config.CASM.feature.checkList.content[0].settings.icon.name}`}
               title="Location"
               line={true}
             />
@@ -102,23 +106,37 @@ function CheckList() {
       </div>
       <div className={styles.gridSeparator}>
         <h2>Checklist</h2>
-        <form>
-          <ul>
-            {config.CASM.feature.checkList.content.map((item, index) => {
-              return (
-                <li key={index}>
-                  <input
-                    type="checkbox"
-                    id={index}
-                    name={item.type}
-                    value={item.type}
-                  />
-                  <label htmlFor={index}> {item.for}</label>
-                </li>
-              );
-            })}
-          </ul>
-        </form>
+
+        {config.CASM.feature.checkList.content.map((item, index) => (
+          <div key={index}>
+            <h3 style={{ textTransform: 'capitalize' }}>{item.for}</h3>
+            <p>
+              Component:{' '}
+              {item.type.replace(
+                item.type.at(0),
+                item.type.at(0).toUpperCase()
+              )}
+            </p>
+            {Object.entries(item.settings).map(([key, value], innerIndex) => (
+              <div key={innerIndex}>
+                <input type="checkbox" />
+                <label>
+                  {' '}
+                  {key.replace(key.at(0), key.at(0).toUpperCase())}:{' '}
+                  {typeof value === 'object'
+                    ? `${value.type} - ${value.name}`
+                    : value === undefined
+                      ? 'None'
+                      : typeof value === 'boolean'
+                        ? value.toString().at(0).toUpperCase() +
+                          value.toString().slice(1)
+                        : value}
+                </label>
+                <br />
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
