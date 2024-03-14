@@ -43,6 +43,7 @@ function AppProvider({ children }) {
 
   const readHeroImageFromLocalStorage = async () => {
     // TODO: Do not implement this. There is a complexity with local storage and images
+    // eslint-disable-next-line no-constant-condition
     if (1 === 2) {
       try {
         const savedData = await retrieveData(LocalStorageKeys.HERO_IMAGE);
