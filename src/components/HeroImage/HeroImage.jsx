@@ -88,11 +88,14 @@ const HeroImage = () => {
       <div>
         {modifiedHeroImage && (
           <div className={styles.modifiedImage}>
-            <img
-              src={modifiedHeroImage}
-              alt="Modified"
-              className={styles.image}
-            />
+            <div className={styles.modifiedImageContainer}>
+              <img
+                src={modifiedHeroImage}
+                alt="Modified"
+                className={styles.image}
+              />
+              <h2 className={styles.title2}>{heroImageText}</h2>
+            </div>
             <div className={styles.downloadButton}>
               <button onClick={downloadModifiedHeroImage}>Download</button>
             </div>
@@ -119,9 +122,10 @@ const HeroImage = () => {
             <input
               type="range"
               name="exportQuality"
-              min="1"
-              max="100"
-              value={heroImageFilters.exportQuality * 100}
+              min="0"
+              max="3"
+              step="1"
+              value={heroImageFilters.exportQuality}
               onChange={handleFilterChange}
               className={styles.rangeInput}
             />

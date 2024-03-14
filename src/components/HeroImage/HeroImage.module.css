@@ -27,6 +27,8 @@
 }
 
 .modifiedImageContainer {
+  position: relative;
+  display: 'inline-block';
 }
 
 @media only screen and (min-width: 45em) {
@@ -74,7 +76,7 @@
 }
 
 /* Styles for the modified image container */
-.modifiedImageContainer {
+.modifiedImageContainerxx {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -105,12 +107,12 @@
 }
 
 /* Styles for the title */
-.title-2 {
+.title2 {
   position: absolute;
   bottom: 20px;
   left: 20px;
   color: #ffffff;
-  font-size: 2.8125rem;
+  font-size: 1.3125rem;
   line-height: 1.11;
   letter-spacing: -0.01111111em;
   padding: 10px;

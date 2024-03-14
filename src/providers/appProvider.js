@@ -145,7 +145,8 @@ function AppProvider({ children }) {
           draft.fillRectHeight = value / 100 || 0;
           break;
         case 'exportQuality'.toLowerCase():
-          draft.exportQuality = value / 100 || 0.95;
+          console.log('value', value);
+          draft.exportQuality = parseInt(value); // 0..3
           break;
         default:
           break;
@@ -206,7 +207,29 @@ function AppProvider({ children }) {
         height * (heroImageFilters.fillRectHeight || 1)
       ); // Fill the last 35%
 
-      const quality = heroImageFilters.exportQuality || 0.95;
+      let quality = 0.95;
+
+      switch (heroImageFilters.exportQuality) {
+        case 0:
+          quality = 0.33; //low
+          break;
+        case 1:
+          quality = 0.7; // medium
+          break;
+        case 2:
+          quality = 0.95; //high
+          break;
+
+        case 3:
+          quality = 1; //highest
+          break;
+
+        default:
+          quality = 0.95;
+          break;
+      }
+
+      console.log('current quality', quality);
 
       // Convert canvas to image source
       const fileExtension = heroImage
