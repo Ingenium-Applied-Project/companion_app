@@ -1,7 +1,7 @@
 .phoneFrame {
   width: 390px; /* iPhone 12 Pro width */
   height: 884px; /* iPhone 12 Pro height */
-  background-color: #f2f2f2;
+  background-color: rgb(var(--background-end-rgb));
   border: 0.1rem solid #ccc;
   border-radius: 1.5rem;
   overflow: hidden;
@@ -16,7 +16,7 @@
   transform: translateX(-50%);
   width: 10rem; /* Width of the notch */
   height: 2rem; /* Height of the notch */
-  background-color: #000;
+  background-color: rgb(var(--foreground-rgb));
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
   z-index: 10;
