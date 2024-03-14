@@ -26,7 +26,7 @@ function CheckList() {
         <h2>Mockup</h2>
         <PhoneMockup>
           <MockupHeader
-            image={'./artifact-canadair.webp'}
+            image={'/artifact-canadair.webp'}
             alt={'Canadair Sabre'}
             title={'Canadair Sabre'}
           />
@@ -53,7 +53,7 @@ function CheckList() {
                 return (
                   <Image
                     key={index}
-                    src="./artifact-canadair.webp"
+                    src="/artifact-canadair.webp"
                     alt="Canadair Sabre"
                     width={300}
                     height={180}
@@ -91,7 +91,7 @@ function CheckList() {
             </MockupContent>
             <MockupContent>
               <Image
-                src="./artifact-canadair.webp"
+                src="/artifact-canadair.webp"
                 alt="Canadair Sabre"
                 width={300}
                 height={180}
