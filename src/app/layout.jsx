@@ -1,3 +1,4 @@
+import '@fortawesome/fontawesome-free/css/all.css'; // import Font Awesome CSS
 import { Inter } from 'next/font/google';
 import Header from '../components/Header/Header.jsx';
 import './globals.css';
