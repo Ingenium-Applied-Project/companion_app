@@ -18,6 +18,9 @@ export default function Home() {
         <li className={styles.link}>
           <Link href="/multiple-size-image">Multiple Size Image</Link>
         </li>
+        <li className={styles.link}>
+          <Link href="/health-check">Health Check</Link>
+        </li>
       </ul>
     </main>
   );
