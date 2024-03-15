@@ -1,6 +1,6 @@
 // app/api/route.jsx
 
-import fetchStqry from '../../utils/api/fetch';
+import fetchStqry from '../../utils/api/fetchStqry';
 
 const screens = async () => {
   const url = 'https://app.mytoursapp.com/api/v3/app/manifest';
