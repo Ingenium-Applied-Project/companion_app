@@ -68,24 +68,22 @@ const HeroImage = () => {
           />
         </div>
       </div>
-      <div className="">
-        <div>
-          {heroImage && (
-            <div className={styles.modifiedImageContainer}>
-              <img
-                src={heroImage}
-                alt="Original Hero Image"
-                className={styles.image}
-              />
-              <h2 className={styles.title2}>{heroImageText}</h2>
-            </div>
-          )}
-        </div>
+      <div className={styles.originalImageContainer}>
+        {heroImage && (
+          <div className={styles.imageContainer}>
+            <img
+              src={heroImage}
+              alt="Original Hero Image"
+              className={styles.image}
+            />
+            <h2 className={styles.title2}>{heroImageText}</h2>
+          </div>
+        )}
       </div>
-      <div>
+      <div className={styles.modifiedImageContainer}>
         {modifiedHeroImage && (
-          <div className={styles.modifiedImage}>
-            <div className={styles.modifiedImageContainer}>
+          <div>
+            <div className={styles.imageContainer}>
               <img
                 src={modifiedHeroImage}
                 alt="Modified"
@@ -96,68 +94,44 @@ const HeroImage = () => {
             <div>
               <button onClick={downloadModifiedHeroImage}>Download</button>
             </div>
+
+            <div>
+              <p className={styles.title}> Step 3 Adjust Settings</p>
+
+              <div>
+                <label className={styles.label}>
+                  Gradient Start Height Pct:
+                </label>
+                <input
+                  type="range"
+                  name="gradientStartHeight"
+                  min="0"
+                  max="100"
+                  value={heroImageFilters.gradientStartHeight * 100}
+                  onChange={handleFilterChange}
+                  className={styles.rangeInput}
+                />
+              </div>
+
+              <div>
+                <label className={styles.label}>Export Quality:</label>
+                <input
+                  type="range"
+                  name="exportQuality"
+                  min="0"
+                  max="3"
+                  step="1"
+                  value={heroImageFilters.exportQuality}
+                  onChange={handleFilterChange}
+                  className={styles.rangeInput}
+                />
+              </div>
+            </div>
           </div>
         )}
-        <div>
-          <p className={styles.title}> Step 3 Adjust Settings</p>
-
-          <div>
-            <label className={styles.label}>Gradient Start Height Pct:</label>
-            <input
-              type="range"
-              name="gradientStartHeight"
-              min="0"
-              max="100"
-              value={heroImageFilters.gradientStartHeight * 100}
-              onChange={handleFilterChange}
-              className={styles.rangeInput}
-            />
-          </div>
-
-          <div>
-            <label className={styles.label}>Export Quality:</label>
-            <input
-              type="range"
-              name="exportQuality"
-              min="0"
-              max="3"
-              step="1"
-              value={heroImageFilters.exportQuality}
-              onChange={handleFilterChange}
-              className={styles.rangeInput}
-            />
-          </div>
-        </div>
       </div>
     </div>
   );
 };
 
 export default HeroImage;
-
-// <div className={styles.sourceContainer}>
-// <div>
-//   <p>Enter a title for your image:</p>
-//   <input
-//     type="text"
-//     value={heroImageText}
-//     onChange={handleTextChange}
-//     className={styles.textInput}
-//   />
-// </div>
-// <span>Upload Hero Image:</span>
-// <input
-//   type="file"
-//   onChange={handleHeroImageUpload}
-//   accept="image/*"
-//   className={styles.fileInput}
-// />
-// </div>
-
-// <div className={styles.modifiedImageContainer}>
-// <div className={styles.filtersContainer}>
-
-// </div>
-
-// <div className={styles.downloadButton}>[Download button]</div>
-// </div>
