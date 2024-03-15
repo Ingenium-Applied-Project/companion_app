@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import apiHandler from '../../utils/api/fetchScreens'; // Adjust the path based on your actual file structure
+import style from './page.module.css';
 
-const MultipleSizeImage = () => {
+const HealthCheck = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,17 +35,26 @@ const MultipleSizeImage = () => {
 
   return (
     <div>
-      <h1>Multiple Size Image</h1>
-      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
+      <h1>Fetch Data</h1>
+      {/* <pre>{JSON.stringify(data.screensArr.screens, null, 2)}</pre> */}
       {Array.isArray(data.screensArr.screens) &&
       data.screensArr.screens.length > 0 ? (
         <div>
           <p>Data fetched successfully!</p>
           {/* Render your data here */}
-          <ul>
-            {data.screensArr.screens.map((item) => (
-              <li key={item.id}>{item.name}</li>
-            ))}
+          <ul className={style.grid}>
+            {data.screensArr.screens.map((element) => {
+              return (
+                <li key={element.id} className={style.gridItems}>
+                  <span className={style.gridItem}>
+                    Screen Id: {element.id}
+                  </span>
+                  <span className={style.gridItem}>
+                    Screen Version: {element.version}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       ) : (
@@ -54,4 +64,4 @@ const MultipleSizeImage = () => {
   );
 };
 
-export default MultipleSizeImage;
+export default HealthCheck;
