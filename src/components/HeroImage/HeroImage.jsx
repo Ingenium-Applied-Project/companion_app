@@ -1,7 +1,6 @@
 'use client';
 
 import { useApp } from '@/providers/appProvider';
-import { useEffect, useState } from 'react';
 import styles from './HeroImage.module.css';
 
 const HeroImage = () => {
@@ -14,28 +13,8 @@ const HeroImage = () => {
     heroImageFilters,
     updateHeroFilterValue,
     downloadModifiedHeroImage,
+    removeHeroSourceImage,
   } = useApp();
-
-  const [showColorPicker1, setShowColorPicker1] = useState(false);
-  const [showColorPicker2, setShowColorPicker2] = useState(false);
-
-  const handleClickOutside = (event) => {
-    // Check if the click is outside the color picker
-    if (!event.target.closest('.sketch-picker') && showColorPicker1) {
-      setShowColorPicker1(false);
-    }
-
-    if (!event.target.closest('.sketch-picker') && showColorPicker2) {
-      setShowColorPicker2(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showColorPicker1, showColorPicker2]);
 
   const handleHeroImageUpload = async (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -52,6 +31,10 @@ const HeroImage = () => {
     await updateHeroFilterValue({ name: name, value: value });
   };
 
+  const handleRemoveImage = async () => {
+    await removeHeroSourceImage();
+  };
+
   return (
     <div className={styles.container}>
       {/* Text Input where user enters the screen-title */}
@@ -65,23 +48,37 @@ const HeroImage = () => {
       </div>
 
       {/* Upload Button */}
-      <div className={styles.uploadButtonContainer}>
-        <input
-          type="file"
-          onChange={handleHeroImageUpload}
-          accept="image/*"
-          className={styles.fileInput}
-          title="Upload Hero Image"
-        />
+      <div>
+        <div className={styles.uploadButtonContainer}>
+          {heroImage && (
+            <button
+              title="test"
+              className={styles.fileInput}
+              onClick={handleRemoveImage}
+            >
+              Remove Image
+            </button>
+          )}
+          <input
+            type="file"
+            onChange={handleHeroImageUpload}
+            accept="image/*"
+            className={styles.fileInput}
+            title="Upload Hero Image"
+          />
+        </div>
       </div>
       <div className="">
         <div>
           {heroImage && (
-            <img
-              src={heroImage}
-              alt="Original Hero Image"
-              className={styles.image}
-            />
+            <div className={styles.modifiedImageContainer}>
+              <img
+                src={heroImage}
+                alt="Original Hero Image"
+                className={styles.image}
+              />
+              <h2 className={styles.title2}>{heroImageText}</h2>
+            </div>
           )}
         </div>
       </div>
@@ -96,7 +93,7 @@ const HeroImage = () => {
               />
               <h2 className={styles.title2}>{heroImageText}</h2>
             </div>
-            <div className={styles.downloadButton}>
+            <div>
               <button onClick={downloadModifiedHeroImage}>Download</button>
             </div>
           </div>

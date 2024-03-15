@@ -20,6 +20,7 @@ function AppProvider({ children }) {
   const [heroImageFilters, setHeroImageFilters] = useState(
     HeroImageDefaultsCASM
   );
+  const [heroImageOriginalName, setHeroImageOriginalName] = useState('');
 
   useEffect(() => {}, []);
 
@@ -95,6 +96,7 @@ function AppProvider({ children }) {
     try {
       sourceImage = URL.createObjectURL(image);
       setHeroImage(sourceImage);
+      setHeroImageOriginalName(image.name);
     } catch (error) {
       console.error(error);
     }
@@ -118,10 +120,8 @@ function AppProvider({ children }) {
 
   // Removes the hero image that was previously uploaded
   const removeHeroSourceImage = async (payload) => {
-    // TODO:
-    // 1. Reset the state
-    // 2. Reset the local storage
-    // 3. Reset the modified image.
+    setHeroImage(null);
+    setHeroImageOriginalName('');
   };
 
   const updateHeroFilterValue = async (payload) => {
@@ -130,13 +130,13 @@ function AppProvider({ children }) {
     const newFilters = produce(heroImageFilters, (draft) => {
       switch (name.toLowerCase()) {
         case 'gradientStartHeight'.toLowerCase():
-          draft.gradientStartHeight = value / 100 || 0;
+          draft.gradientStartHeight = value / 100;
           break;
         case 'gradientEndHeight'.toLowerCase():
           draft.gradientEndHeight = value / 100 || 0;
           break;
         case 'gradientStartColor'.toLowerCase():
-          draft.gradientStartColor = value || 'rgba(0,0,0,0)';
+          draft.gradientStartColor = value || 'rgba(0,0,0,0.4)';
           break;
         case 'gradientEndColor'.toLowerCase():
           draft.gradientEndColor = value || 'rgba(0,0,0,1)';
@@ -183,8 +183,7 @@ function AppProvider({ children }) {
 
       // Adjust gradient to cover the last 35% of the image height
 
-      const gradientStart =
-        height * (heroImageFilters.gradientStartHeight || 0.5);
+      const gradientStart = height * heroImageFilters.gradientStartHeight;
       const gradientEnd = height * (heroImageFilters.gradientEndHeight || 1.0);
 
       // Create a gradient
@@ -195,8 +194,8 @@ function AppProvider({ children }) {
         gradientEnd
       );
 
-      gradient.addColorStop(0, 'rgba(0,0,0,0)');
-      gradient.addColorStop(0.33, heroImageFilters.gradientStartColor);
+      // gradient.addColorStop(0, 'rgba(0,0,0,0)');
+      gradient.addColorStop(0, heroImageFilters.gradientStartColor);
       gradient.addColorStop(1, heroImageFilters.gradientEndColor);
 
       ctx.fillStyle = gradient;
@@ -259,11 +258,18 @@ function AppProvider({ children }) {
 
   const downloadModifiedHeroImage = async () => {
     // Create a temporary anchor (a) element
-    if (!modifiedHeroImage) return;
 
+    if (!modifiedHeroImage || !heroImageOriginalName) return;
+    // Extract the file name and extension
+    const fileNameParts = heroImageOriginalName.split('.');
+    const extension = fileNameParts.pop();
+    const fileNameWithoutExtension = fileNameParts.join('.');
+    const newFileName = `${fileNameWithoutExtension}-gradient.${extension}`;
+
+    // Set the download attributes
     const element = document.createElement('a');
     element.setAttribute('href', modifiedHeroImage);
-    element.setAttribute('download', 'modified-image.png');
+    element.setAttribute('download', newFileName);
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
