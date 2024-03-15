@@ -36,12 +36,13 @@ const MultipleSizeImage = () => {
     <div>
       <h1>Multiple Size Image</h1>
       {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-      {Array.isArray(data.screens) && data.screens.length > 0 ? (
+      {Array.isArray(data.screensArr.screens) &&
+      data.screensArr.screens.length > 0 ? (
         <div>
           <p>Data fetched successfully!</p>
           {/* Render your data here */}
           <ul>
-            {data.screens.map((item) => (
+            {data.screensArr.screens.map((item) => (
               <li key={item.id}>{item.name}</li>
             ))}
           </ul>
