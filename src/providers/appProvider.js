@@ -1,6 +1,7 @@
 'use client';
 
 import { HeroImageDefaultsCASM, LocalStorageKeys } from '@/constants/constants';
+import config from '@/museumConfig';
 import { retrieveData, storeData } from '@/utils/asyncStorage';
 import { isBlobURL } from '@/utils/utils';
 import { produce } from 'immer';
@@ -37,7 +38,8 @@ function AppProvider({ children }) {
 
   // returns app configuration based on given app name. Blank value would return current app config.
   const getAppConfiguration = (payload) => {
-    const { app = '' } = payload;
+    const { app = 'CASM' } = payload;
+    return config[app] || null;
   };
 
   // Hero Image functions - Start
@@ -277,6 +279,23 @@ function AppProvider({ children }) {
 
   // Hero Image functions - End
 
+  // System health check - Start
+
+  const startSystemHealthCheck = async (payload) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/healthCheck');
+      if (!response.ok) {
+        throw new Error('Failed to fetch health check. ', response.status);
+      }
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // System health check - End
+
   return (
     <AppContext.Provider
       value={{
@@ -290,6 +309,8 @@ function AppProvider({ children }) {
         setHeroImageText, // Called from the Hero image component to set the heroImageText
         removeHeroSourceImage, // When user deletes the hero image
         downloadModifiedHeroImage, // When user clicks on "Download" button on the modified hero image
+
+        startSystemHealthCheck, // Runs system health check
       }}
     >
       {children}

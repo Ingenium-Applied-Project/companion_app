@@ -66,6 +66,24 @@ const config = {
         ],
       },
     },
+    api: {
+      baseUrl: 'https://app.mytoursapp.com/api/v3/',
+      auth: {
+        username: '8919',
+        password: 'f313a575-e87e-45b4-88ef-43445071f0da',
+        legacy_app_id: '9403',
+      },
+      headers: {
+        HTTP_STQRY_PROJECT_TYPE: 'app',
+      },
+      endPoints: {
+        rootProject: 'project',
+        project: 'project/manifest',
+        collections: 'collections/:id/:version/:language',
+        screens: 'screens/:id/:language/:version',
+        media_items: 'media_items/:id',
+      },
+    },
   },
   MUSEUM2: {},
   MUSEUM3: {},
