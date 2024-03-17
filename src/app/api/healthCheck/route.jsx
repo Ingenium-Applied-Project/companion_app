@@ -1,16 +1,14 @@
 import config from '@/museumConfig';
 import { NextResponse } from 'next/server';
 
-// stores appConfig object for all functions called within the same sequence
-let appConfig;
-
-// loadConfig must be called as the first function in each exported function (GET, POST, etc.)
-const loadConfig = (app = 'CASM') => {
-  appConfig = config[app] || {};
+// Returns app config for CASM
+const getConfig = (app = 'CASM') => {
+  return config[app] || {};
 };
 
-// Used in the original entry point in order to get initial access to the end point.
+// Used in the original entry point in order to get initial access to STORY end point.
 const getRequestHeaders = () => {
+  const appConfig = getConfig();
   const { auth, headers } = appConfig.api;
   return {
     HTTP_STQRY_PROJECT_TYPE: headers.HTTP_STQRY_PROJECT_TYPE,
@@ -21,6 +19,7 @@ const getRequestHeaders = () => {
 // Used in further fetch requests to get more detailed access.
 // This has a different username than getRequestHeaders function
 const getLegacyAppRequestHeaders = () => {
+  const appConfig = getConfig();
   const { auth, headers } = appConfig.api;
   return {
     HTTP_STQRY_PROJECT_TYPE: headers.HTTP_STQRY_PROJECT_TYPE,
@@ -28,23 +27,21 @@ const getLegacyAppRequestHeaders = () => {
   };
 };
 
-// placeholder for POST method
+// placeholder for POST method (won't be needed)
 export async function POST(req) {
   return NextResponse.json({ message: 'POST request processed' });
 }
 
 // This method returns the health-check result.
-// It fetches every collection, screen, and media item, per language and returns a detailed result.
-
-export async function GET(req) {
-  loadConfig();
+// It fetches every collection and screen, per language (en and fr) and returns a detailed report.
+export async function GET(_) {
+  const appConfig = getConfig();
 
   const { baseUrl, endPoints } = appConfig.api;
-  const { languages } = appConfig;
-
   const projectURL = baseUrl + endPoints.project;
 
-  // first fetch
+  // first fetch (for initial access)
+  // If the first fetch is successful, then the system starts fetching each collection and screen
   const requestHeaders = getRequestHeaders();
 
   try {
@@ -62,41 +59,38 @@ export async function GET(req) {
 
     const responseData = await response.json();
 
-    // console.log(responseData);
-
     let { collections, media_items, screens } = responseData;
 
-    //TODO: Test for few elements only: Remove it later when the functionality is good
-    if (collections && 1 === 1) {
-      collections = collections.slice(0, 1);
+    //TODO: TEST for few elements only: Remove it later when the functionality is good
+    if (collections && 1 === 2) {
+      collections = collections.slice(0, 0);
     }
 
-    if (collections && Array.isArray(collections) && collections.length > 0) {
-      const collectionsPromiseArray = [];
-      if (Array.isArray(languages) && languages.length > 0) {
-        collections.forEach((collection) => {
-          languages.forEach((lang) => {
-            const { code } = lang;
-            if (code) {
-              //check this collection for the given language
-              collection.health_check_language = code;
-              const promise = getCollectionPromise(collection);
-              if (promise) {
-                collectionsPromiseArray.push(promise);
-              }
-            }
-          });
-        });
-      }
-
-      const collectionResult = await Promise.all(collectionsPromiseArray);
-      console.log(
-        'promise result: ',
-        collectionResult.length
-        // collectionResult
-      );
+    //TODO: TEST for few elements only: Remove it later when the functionality is good
+    if (screens && 1 === 2) {
+      screens = screens.slice(0, 1);
     }
 
+    // Create promises for each main functional area.
+    // - collections
+    // - screens
+
+    const collectionsHealthCheckPromise =
+      getCollectionsHealthCheckPromise(collections);
+    const screensHealthCheckPromise = getScreensHealthCheckPromise(screens);
+
+    const startTime = Date.now();
+    const promiseResults = await Promise.all([
+      collectionsHealthCheckPromise,
+      screensHealthCheckPromise,
+    ]);
+    console.log(promiseResults[0]);
+    console.log(promiseResults[1]);
+
+    console.log(promiseResults[0].length, 'collections printed');
+    console.log(promiseResults[1].length, 'screens printed');
+    const endTime = Date.now();
+    console.log(`Elapsed time ${endTime - startTime} miliseconds`);
     return NextResponse.json({
       message: 'GET request processed',
       responseData,
@@ -107,7 +101,130 @@ export async function GET(req) {
   }
 }
 
+// Major promise to get collections health check
+const getCollectionsHealthCheckPromise = (collections) => {
+  const appConfig = getConfig();
+  const { languages } = appConfig;
+  return new Promise((resolve, _) => {
+    if (!Array.isArray(languages) || !languages.length) {
+      resolve([]);
+    }
+
+    if (Array.isArray(collections) && collections.length > 0) {
+      const healthCheckPromiseArray = [];
+      collections.forEach((collection) => {
+        languages.forEach((lang) => {
+          const { code } = lang;
+          if (code) {
+            collection.health_check_language = code;
+            const promise = getCollectionPromise(collection);
+            if (promise) {
+              healthCheckPromiseArray.push(promise);
+            }
+          }
+        });
+      });
+
+      Promise.all(healthCheckPromiseArray)
+        .then((results) => {
+          resolve(results);
+        })
+        .catch((_) => {
+          resolve([]);
+        });
+    } else {
+      resolve([]);
+    }
+  });
+};
+
+const getScreensHealthCheckPromise = (screens) => {
+  const appConfig = getConfig();
+
+  const { languages } = appConfig;
+
+  return new Promise((resolve, _) => {
+    if (!Array.isArray(languages) || !languages.length) {
+      resolve([]);
+    }
+
+    const healthCheckPromiseArray = [];
+    if (Array.isArray(screens) && screens.length > 0) {
+      screens.forEach((screen) => {
+        languages.forEach((lang) => {
+          const { code } = lang;
+          if (code) {
+            screen.health_check_language = code;
+            const promise = getScreenPromise(screen);
+            if (promise) {
+              healthCheckPromiseArray.push(promise);
+            }
+          }
+        });
+      });
+
+      Promise.all(healthCheckPromiseArray)
+        .then((results) => {
+          resolve(results);
+        })
+        .catch(() => {
+          resolve([]);
+        });
+    } else {
+      resolve([]);
+    }
+  });
+};
+
+const getScreenPromise = (payload) => {
+  const appConfig = getConfig();
+
+  const { id, version, health_check_language } = payload;
+  const { baseUrl, endPoints } = appConfig.api;
+  const url = (baseUrl + endPoints.screens)
+    .replace(':id', id)
+    .replace(':language', health_check_language)
+    .replace(':version', version);
+  const requestHeaders = getLegacyAppRequestHeaders();
+  return new Promise((resolve, _) => {
+    fetch(url, { method: 'GET', headers: requestHeaders })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch project data. Status: ${response.status}`
+          );
+        }
+        return response.json();
+      })
+      .then((responseData) => {
+        responseData.health_check_language = health_check_language;
+        // console.log('raw screen sections', responseData.sections);
+        const obj = new Screen(responseData);
+        resolve({
+          status: 'success',
+          item: 'screen-health-check',
+          error: null,
+          data: obj,
+        });
+      })
+      .catch((error) => {
+        resolve({
+          status: 'error',
+          item: 'screen-health-check',
+          error: error,
+          data: null,
+          errorStatus: error.status,
+          id: id,
+          version: version,
+        });
+      });
+  });
+};
+
+// Check a collection item
 const getCollectionPromise = (payload) => {
+  const appConfig = getConfig();
+
   const { id, version, health_check_language } = payload;
   const { baseUrl, endPoints } = appConfig.api;
   const url = (baseUrl + endPoints.collections)
@@ -131,23 +248,24 @@ const getCollectionPromise = (payload) => {
         return response.json();
       })
       .then((responseData) => {
+        responseData.health_check_language = health_check_language;
         const obj = new Collection(responseData);
-        obj.check();
         resolve({
           status: 'success',
-          responseData: responseData,
+          item: 'collection-health-check',
           error: null,
-          object: obj.getHealthReport(),
+          data: obj, // represents the relevant data for our health check
         });
       })
       .catch((error) => {
-        // still resolve but with error. We don't want Promise.all to fail completely
         resolve({
           status: 'error',
+          item: 'collection-health-check',
+          error: error,
+          data: null,
+          errorStatus: error.status,
           id: id,
           version: version,
-          error: error,
-          errorStatus: error.status,
         });
       });
   });
@@ -157,21 +275,94 @@ const getCollectionPromise = (payload) => {
 // function check() : checks object according to the rules
 // function getHealthReport(): returns the health report object for the given collection (with reduced data.)
 class Collection {
+  healthReport = {};
   constructor(data) {
     // console.log('data', data);
     this.id = data.id;
     this.version = data.version;
     this.subtype = data.subtype;
     this.health_check_language = data.health_check_language || null;
-    this.name = data.name;
-    this.description = data.description;
-    this.short_title = data.short_title;
-    this.tour_mode = data.tour_mode;
-    this.map_pin_color = data.map_pin_color;
-    this.map_pin_icon = data.map_pin_icon;
-    this.map_pin_style = data.map_pin_style;
-    this.length_min = data.length_min;
-    this.length_max = data.length_max;
+    this.name = data.name || null;
+    this.description = data.description || null;
+    this.short_title = data.short_title || null;
+    this.tour_mode = data.tour_mode || null;
+    this.map_pin_color = data.map_pin_color || null;
+    this.map_pin_icon = data.map_pin_icon || null;
+    this.map_pin_style = data.map_pin_style || null;
+    this.length_min = data.length_min || null;
+    this.length_max = data.length_max || null;
+    this.cover_image = null;
+    this.cover_image_grid = null;
+    this.sections = [];
+
+    if (data.cover_image) {
+      this.cover_image = {
+        id: data.cover_image.id || null,
+        name: data.cover_image.name || null,
+        media_type: data.cover_image.media_type || null,
+        attribution: data.cover_image.attribution || null,
+        description: data.cover_image.description || null,
+        caption: data.cover_image.caption || '',
+        file_id: data.cover_image.file.id || null,
+        file_name: data.cover_image.filename || null,
+        file_content_type: data.cover_image.content_type || null,
+        file_size: data.cover_image.file_size || -1,
+        file_original_url: data.cover_image.original_url || null,
+        file_width: data.cover_image.width || -1,
+        file_height: data.cover_image.height || -1,
+      };
+    }
+
+    if (data.cover_image_grid) {
+      this.cover_image_grid = {
+        id: data.cover_image_grid.id || null,
+        name: data.cover_image_grid.name || null,
+        media_type: data.cover_image_grid.media_type || null,
+        attribution: data.cover_image_grid.attribution || null,
+        description: data.cover_image_grid.description || null,
+        caption: data.cover_image_grid.caption || '',
+        file_id: data.cover_image_grid.file.id || null,
+        file_name: data.cover_image_grid.filename || null,
+        file_content_type: data.cover_image_grid.content_type || null,
+        file_size: data.cover_image_grid.file_size || -1,
+        file_original_url: data.cover_image_grid.original_url || null,
+        file_width: data.cover_image_grid.width || -1,
+        file_height: data.cover_image_grid.height || -1,
+      };
+    }
+
+    if (data.sections) {
+      const { sections } = data.sections;
+      if (Array.isArray(sections) && sections.length > 0) {
+        this.sections = sections;
+      }
+    }
+  }
+  check() {
+    //TODO: Check current collection against the rules.
+  }
+  getHealthReport() {
+    this.healthReport.description = `Health report for ${this.id} and ${this.health_check_language}`;
+    this.healthReport.reportItems = [];
+    return this.healthReport;
+  }
+}
+
+class Screen {
+  healthReport = {};
+  constructor(data) {
+    // console.log('data', data);
+    this.id = data.id;
+    this.version = data.version;
+    this.screen_type = data.screen_type; //story | x | y | z
+    this.health_check_language = data.health_check_language || null;
+    this.name = data.name; //e.g. WA-SU-ExhibitionK-ColdWar-MikoyanGurevichMigLim2
+    this.title = data.title || ''; //WSK Lim-2 (Mikoyan-Gurevich MiG- 15bis)
+    this.short_title = data.short_title || ''; //WSK Lim-2 (Mikoyan-Gurevich MiG- 15bis)
+    this.header_layout = data.header_layout || null; // image_and_title | x
+    this.map_pin_color = data.map_pin_color || null;
+    this.map_pin_icon = data.map_pin_icon || null;
+    this.map_pin_style = data.map_pin_style || null;
     this.cover_image = null;
     this.cover_image_grid = null;
 
@@ -212,9 +403,11 @@ class Collection {
     }
   }
   check() {
-    //TODO: Check current collection against
+    //TODO: Check current collection against the rules.
   }
   getHealthReport() {
-    return { description: 'Health report for: ', reportItems: [] };
+    this.healthReport.description = `Health report for ${this.id} and ${this.health_check_language}`;
+    this.healthReport.reportItems = [];
+    return this.healthReport;
   }
 }
