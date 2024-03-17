@@ -283,7 +283,7 @@ function AppProvider({ children }) {
 
   const startSystemHealthCheck = async (payload) => {
     try {
-      const response = await fetch('http://localhost:3000/api/healthCheck');
+      const response = await fetch('/api/healthCheck');
       if (!response.ok) {
         throw new Error('Failed to fetch health check. ', response.status);
       }
