@@ -1,17 +1,25 @@
 import config from '@/museumConfig';
 import { NextResponse } from 'next/server';
 
-let appConfig = {};
+// stores appConfig object for all functions called within the same sequence
+let appConfig;
 
+// loadConfig must be called as the first function in each exported function (GET, POST, etc.)
+const loadConfig = (app = 'CASM') => {
+  appConfig = config[app] || {};
+};
+
+// Used in the original entry point in order to get initial access to the end point.
 const getRequestHeaders = () => {
   const { auth, headers } = appConfig.api;
-
   return {
     HTTP_STQRY_PROJECT_TYPE: headers.HTTP_STQRY_PROJECT_TYPE,
     Authorization: `Basic ${btoa(`${auth.username}:${auth.password}`)}`,
   };
 };
 
+// Used in further fetch requests to get more detailed access.
+// This has a different username than getRequestHeaders function
 const getLegacyAppRequestHeaders = () => {
   const { auth, headers } = appConfig.api;
   return {
@@ -20,14 +28,19 @@ const getLegacyAppRequestHeaders = () => {
   };
 };
 
+// placeholder for POST method
 export async function POST(req) {
   return NextResponse.json({ message: 'POST request processed' });
 }
+
+// This method returns the health-check result.
+// It fetches every collection, screen, and media item, per language and returns a detailed result.
 
 export async function GET(req) {
   loadConfig();
 
   const { baseUrl, endPoints } = appConfig.api;
+  const { languages } = appConfig;
 
   const projectURL = baseUrl + endPoints.project;
 
@@ -51,18 +64,37 @@ export async function GET(req) {
 
     // console.log(responseData);
 
-    const { collections, media_items, screens } = responseData;
+    let { collections, media_items, screens } = responseData;
 
-    collections;
-    if (collections && collections[0]) {
-      getCollectionPromise(collections[0])
-        .then((result) => {
-          console.log('Result: ', result);
-          // console.log('sucess');
-        })
-        .catch((error) => {
-          console.error(error);
+    //TODO: Test for few elements only: Remove it later when the functionality is good
+    if (collections && 1 === 1) {
+      collections = collections.slice(0, 1);
+    }
+
+    if (collections && Array.isArray(collections) && collections.length > 0) {
+      const collectionsPromiseArray = [];
+      if (Array.isArray(languages) && languages.length > 0) {
+        collections.forEach((collection) => {
+          languages.forEach((lang) => {
+            const { code } = lang;
+            if (code) {
+              //check this collection for the given language
+              collection.health_check_language = code;
+              const promise = getCollectionPromise(collection);
+              if (promise) {
+                collectionsPromiseArray.push(promise);
+              }
+            }
+          });
         });
+      }
+
+      const collectionResult = await Promise.all(collectionsPromiseArray);
+      console.log(
+        'promise result: ',
+        collectionResult.length
+        // collectionResult
+      );
     }
 
     return NextResponse.json({
@@ -76,59 +108,61 @@ export async function GET(req) {
 }
 
 const getCollectionPromise = (payload) => {
-  const { id, version } = payload;
+  const { id, version, health_check_language } = payload;
   const { baseUrl, endPoints } = appConfig.api;
   const url = (baseUrl + endPoints.collections)
     .replace(':id', id)
-    .replace(':version', version)
-    .replace(':language', 'en');
+    .replace(':language', health_check_language)
+    .replace(':version', version);
+
   const requestHeaders = getLegacyAppRequestHeaders();
 
-  return new Promise(async (resolve, _) => {
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: requestHeaders,
+  return new Promise((resolve, _) => {
+    fetch(url, {
+      method: 'GET',
+      headers: requestHeaders,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch project data. Status: ${response.status}`
+          );
+        }
+        return response.json();
+      })
+      .then((responseData) => {
+        const obj = new Collection(responseData);
+        obj.check();
+        resolve({
+          status: 'success',
+          responseData: responseData,
+          error: null,
+          object: obj.getHealthReport(),
+        });
+      })
+      .catch((error) => {
+        // still resolve but with error. We don't want Promise.all to fail completely
+        resolve({
+          status: 'error',
+          id: id,
+          version: version,
+          error: error,
+          errorStatus: error.status,
+        });
       });
-      //   console.log('fetch url', url);
-      // console.log('fetch headers', response);
-      // Handle the response as needed
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch project data. Status: ${response.status}`
-        );
-      }
-      const responseData = await response.json();
-      const obj = new Collection(responseData);
-
-      resolve({
-        status: 'success',
-        responseData: responseData,
-        error: null,
-        object: obj,
-      });
-    } catch (error) {
-      resolve({
-        status: 'error',
-        id: id,
-        version: version,
-        error: error,
-        errorStatus: error.status,
-      });
-    }
   });
 };
 
-const loadConfig = (app = 'CASM') => {
-  appConfig = config[app] || {};
-};
-
+// Stores the Collection data. Members of this class will be evaluated according to the rules we defined.
+// function check() : checks object according to the rules
+// function getHealthReport(): returns the health report object for the given collection (with reduced data.)
 class Collection {
   constructor(data) {
     // console.log('data', data);
     this.id = data.id;
     this.version = data.version;
     this.subtype = data.subtype;
+    this.health_check_language = data.health_check_language || null;
     this.name = data.name;
     this.description = data.description;
     this.short_title = data.short_title;
@@ -180,28 +214,7 @@ class Collection {
   check() {
     //TODO: Check current collection against
   }
-  getReport() {}
+  getHealthReport() {
+    return { description: 'Health report for: ', reportItems: [] };
+  }
 }
-
-const getCollectionObject = (payload) => {
-  const obj = {};
-
-  obj.id = payload.id;
-  // obj.subtype =
-
-  return obj;
-};
-
-const collection = {
-  id: '',
-  version: '',
-  url: '',
-  type: '',
-  passed: [{}],
-  failed: [{}],
-  /*
-    * name: Must start with WA
-
-  
-  */
-};

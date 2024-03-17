@@ -79,11 +79,15 @@ const config = {
       endPoints: {
         rootProject: 'project',
         project: 'project/manifest',
-        collections: 'collections/:id/:version/:language',
+        collections: 'collections/:id/:language/:version/',
         screens: 'screens/:id/:language/:version',
         media_items: 'media_items/:id',
       },
     },
+    languages: [
+      { code: 'en', name: 'English' },
+      { code: 'fr', name: 'French' },
+    ],
   },
   MUSEUM2: {},
   MUSEUM3: {},
