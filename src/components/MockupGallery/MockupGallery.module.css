@@ -1,0 +1,13 @@
+.imageGallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  overflow: scroll;
+  padding: 0 1.5rem;
+}
+
+.imageGallery img {
+  height: auto;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}

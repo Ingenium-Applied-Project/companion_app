@@ -1,0 +1,6 @@
+.contentLocation {
+  padding: 0.5rem 0;
+  margin: 0 1.5rem 0;
+  display: flex;
+  gap: 0.5rem;
+}

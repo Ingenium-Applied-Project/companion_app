@@ -8,7 +8,7 @@ const HeroImageDefaultsCASM = {
   gradientStartColor: 'rgba(0,0,0,0)',
   gradientEndColor: 'rgba(0,0,0,1)',
   fillRectHeight: 1,
-  exportQuality: 0.95,
+  exportQuality: 2, //high
   defaultExportFormat: 'image/jpeg',
 };
 

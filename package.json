@@ -15,6 +15,7 @@
     "webpack": "^5"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.1",
     "@react-native-async-storage/async-storage": "^1.22.3",
     "immer": "^10.0.3",
     "next": "14.1.2",

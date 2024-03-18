@@ -1,0 +1,30 @@
+.phoneFrame {
+  width: 390px; /* iPhone 12 Pro width */
+  height: 884px; /* iPhone 12 Pro height */
+  background-color: rgb(var(--background-end-rgb));
+  border: 0.1rem solid #ccc;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.phoneFrame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10rem; /* Width of the notch */
+  height: 2rem; /* Height of the notch */
+  background-color: rgb(var(--foreground-rgb));
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  z-index: 10;
+}
+
+.phoneScreen {
+  width: 100%;
+  height: 100%;
+  padding: 3rem 0rem;
+  overflow: auto;
+}
