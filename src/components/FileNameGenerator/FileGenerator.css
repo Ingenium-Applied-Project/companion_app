@@ -1,0 +1,81 @@
+.container {
+  margin: 2rem;
+}
+
+button {
+  padding: 0.75rem 3rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: 1px solid #000;
+}
+
+select {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: 1px solid #000;
+}
+
+input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: 1px solid #000;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 3rem;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 3rem;
+  margin-top: 3rem;
+  background-color: #c3c1c1;
+  padding: 1rem;
+}
+
+.tab-content {
+  flex-direction: column;
+}
+
+.areaLabel,
+.nameLabel,
+.aircraftLabel,
+.languageLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.inputSection {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.fullFileInput {
+  display: flex;
+  margin-top: 4rem;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.buttonSection {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.copySection {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
