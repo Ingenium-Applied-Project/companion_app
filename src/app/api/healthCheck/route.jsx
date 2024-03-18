@@ -61,15 +61,15 @@ export async function GET(_) {
 
     let { collections, media_items, screens } = responseData;
 
-    // //TODO: TEST for few elements only: Remove it later when the functionality is good
-    // if (collections && 1 === 1) {
-    //   collections = collections.slice(0, 10);
-    // }
+    //TODO: TEST for few elements only: Remove it later when the functionality is good
+    if (collections && 1 === 1) {
+      collections = collections.slice(0, 10);
+    }
 
-    // //TODO: TEST for few elements only: Remove it later when the functionality is good
-    // if (screens && 1 === 1) {
-    //   screens = screens.slice(0, 10);
-    // }
+    //TODO: TEST for few elements only: Remove it later when the functionality is good
+    if (screens && 1 === 1) {
+      screens = screens.slice(0, 10);
+    }
 
     // Create promises for each main functional area.
     // - collections
