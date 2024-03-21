@@ -5,7 +5,11 @@ import React, { useEffect, useState } from 'react';
 import styles from './SystemHealthCheck.module.css';
 
 const SystemHealthCheck = () => {
-  const { startSystemHealthCheck, systemHealthCheckData } = useApp();
+  const {
+    startSystemHealthCheck,
+    systemHealthCheckData,
+    systemHealthCheckRunning,
+  } = useApp();
 
   const [formattedJSON, setFormattedJSON] = useState(null);
 
@@ -24,12 +28,19 @@ const SystemHealthCheck = () => {
   return (
     <div>
       <p>System health check</p>
-      <button onClick={handleSystemHealthClick}>Run System health check</button>
+      <button
+        onClick={handleSystemHealthClick}
+        disabled={systemHealthCheckRunning}
+      >
+        {!systemHealthCheckRunning && 'Run System health check'}
+        {systemHealthCheckRunning && 'System health check running'}
+      </button>
       <div>
         {formattedJSON && (
           <textarea
             className={styles.textarea}
             value={formattedJSON}
+            onChange={() => {}}
           ></textarea>
         )}
       </div>

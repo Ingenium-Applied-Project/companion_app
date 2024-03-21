@@ -25,6 +25,9 @@ function AppProvider({ children }) {
 
   const [systemHealthCheckData, setSystemHealthCheckData] = useState(null);
 
+  const [systemHealthCheckRunning, setSystemHealthCheckRunning] =
+    useState(false);
+
   useEffect(() => {}, []);
 
   /**
@@ -285,6 +288,8 @@ function AppProvider({ children }) {
 
   const startSystemHealthCheck = async (payload) => {
     try {
+      setSystemHealthCheckRunning(true);
+
       const response = await fetch('/api/healthCheck');
       if (!response.ok) {
         throw new Error('Failed to fetch health check. ', response.status);
@@ -292,8 +297,10 @@ function AppProvider({ children }) {
       const data = await response.json();
       setSystemHealthCheckData(data);
       console.log(data);
+      setSystemHealthCheckRunning(false);
     } catch (error) {
       console.error(error);
+      setSystemHealthCheckRunning(false);
     }
   };
 
@@ -315,6 +322,7 @@ function AppProvider({ children }) {
 
         startSystemHealthCheck, // Runs system health check
         systemHealthCheckData, // retrieved system health check json object
+        systemHealthCheckRunning,
       }}
     >
       {children}
