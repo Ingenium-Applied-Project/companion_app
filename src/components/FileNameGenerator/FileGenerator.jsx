@@ -285,9 +285,14 @@ const FileGenerator = () => {
       </div>
 
       <div className="copySection">
-        <button onClick={handleCopy}>Copy</button>
+        <div className="copyButton">
+          <button onClick={handleCopy}>Copy</button>
+        </div>
         {copySuccess && (
-          <span style={{ color: 'green' }}>Copied to clipboard!</span>
+          <span style={{ color: 'green' }} className="copiedSpan">
+            {' '}
+            Copied to clipboard!
+          </span>
         )}
       </div>
     </div>

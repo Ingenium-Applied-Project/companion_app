@@ -82,5 +82,10 @@ input {
 .copySection {
   margin-top: 2rem;
   display: flex;
-  justify-content: flex-end;
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.copiedSpan {
+  margin-top: 2rem;
 }
