@@ -1,4 +1,5 @@
 'use client';
+import { useApp } from '@/providers/appProvider';
 import React, { useState } from 'react';
 import './FileGenerator.css';
 

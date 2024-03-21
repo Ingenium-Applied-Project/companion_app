@@ -248,6 +248,8 @@ function AppProvider({ children }) {
 
   // Hero Image functions - End
 
+  // File naming functions - Start
+
   return (
     <AppContext.Provider
       value={{

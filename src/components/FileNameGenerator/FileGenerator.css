@@ -45,6 +45,11 @@ input {
   flex-direction: column;
 }
 
+.active {
+  background-color: #6a6767;
+  color: white;
+}
+
 .areaLabel,
 .nameLabel,
 .aircraftLabel,
