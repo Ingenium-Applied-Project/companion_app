@@ -16,7 +16,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import styles from './MultipleSizeImage.module.css';
 
 import { CanvasPreview } from '@/components/MultipleSizeImage/CanvasPreview';
-import { UseDebounceEffect } from './useDebounceEffect';
+import { UseDebounceEffect } from './UseDebounceEffect';
 
 function MultipleSizeImage() {
   let ASPECTRATIO = 1;
