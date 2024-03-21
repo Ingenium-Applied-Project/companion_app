@@ -1,6 +1,7 @@
 'use client';
 
 import { HeroImageDefaultsCASM, LocalStorageKeys } from '@/constants/constants';
+import config from '@/museumConfig';
 import { retrieveData, storeData } from '@/utils/asyncStorage';
 import { isBlobURL } from '@/utils/utils';
 import { produce } from 'immer';
@@ -22,6 +23,11 @@ function AppProvider({ children }) {
   );
   const [heroImageOriginalName, setHeroImageOriginalName] = useState('');
 
+  const [systemHealthCheckData, setSystemHealthCheckData] = useState(null);
+
+  const [systemHealthCheckRunning, setSystemHealthCheckRunning] =
+    useState(false);
+
   useEffect(() => {}, []);
 
   /**
@@ -37,7 +43,8 @@ function AppProvider({ children }) {
 
   // returns app configuration based on given app name. Blank value would return current app config.
   const getAppConfiguration = (payload) => {
-    const { app = '' } = payload;
+    const { app = 'CASM' } = payload;
+    return config[app] || null;
   };
 
   // Hero Image functions - Start
@@ -277,6 +284,28 @@ function AppProvider({ children }) {
 
   // Hero Image functions - End
 
+  // System health check - Start
+
+  const startSystemHealthCheck = async (payload) => {
+    try {
+      setSystemHealthCheckRunning(true);
+
+      const response = await fetch('/api/healthCheck');
+      if (!response.ok) {
+        throw new Error('Failed to fetch health check. ', response.status);
+      }
+      const data = await response.json();
+      setSystemHealthCheckData(data);
+      console.log(data);
+      setSystemHealthCheckRunning(false);
+    } catch (error) {
+      console.error(error);
+      setSystemHealthCheckRunning(false);
+    }
+  };
+
+  // System health check - End
+
   return (
     <AppContext.Provider
       value={{
@@ -290,6 +319,10 @@ function AppProvider({ children }) {
         setHeroImageText, // Called from the Hero image component to set the heroImageText
         removeHeroSourceImage, // When user deletes the hero image
         downloadModifiedHeroImage, // When user clicks on "Download" button on the modified hero image
+
+        startSystemHealthCheck, // Runs system health check
+        systemHealthCheckData, // retrieved system health check json object
+        systemHealthCheckRunning,
       }}
     >
       {children}
