@@ -22,6 +22,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-drag-drop-files": "^2.3.10",
+    "react-image-crop": "^11.0.5",
     "react-image-file-resizer": "^0.4.8"
   },
   "devDependencies": {
