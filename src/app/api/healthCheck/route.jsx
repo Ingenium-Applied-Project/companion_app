@@ -59,16 +59,16 @@ export async function GET(_) {
 
     const responseData = await response.json();
 
-    let { collections, media_items, screens } = responseData;
+    let { collections, screens } = responseData;
 
     //TODO: TEST for few elements only: Remove it later when the functionality is good
     if (collections && 1 === 1) {
-      collections = collections.slice(0, 10);
+      // collections = collections.slice(0, 10);
     }
 
     //TODO: TEST for few elements only: Remove it later when the functionality is good
     if (screens && 1 === 1) {
-      screens = screens.slice(0, 10);
+      // screens = screens.slice(0, 10);
     }
 
     // Create promises for each main functional area.

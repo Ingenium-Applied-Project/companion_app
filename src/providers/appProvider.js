@@ -23,6 +23,8 @@ function AppProvider({ children }) {
   );
   const [heroImageOriginalName, setHeroImageOriginalName] = useState('');
 
+  const [systemHealthCheckData, setSystemHealthCheckData] = useState(null);
+
   useEffect(() => {}, []);
 
   /**
@@ -288,6 +290,7 @@ function AppProvider({ children }) {
         throw new Error('Failed to fetch health check. ', response.status);
       }
       const data = await response.json();
+      setSystemHealthCheckData(data);
       console.log(data);
     } catch (error) {
       console.error(error);
@@ -311,6 +314,7 @@ function AppProvider({ children }) {
         downloadModifiedHeroImage, // When user clicks on "Download" button on the modified hero image
 
         startSystemHealthCheck, // Runs system health check
+        systemHealthCheckData, // retrieved system health check json object
       }}
     >
       {children}

@@ -1,10 +1,21 @@
 'use client';
 
 import { useApp } from '@/providers/appProvider';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import styles from './SystemHealthCheck.module.css';
 
 const SystemHealthCheck = () => {
-  const { startSystemHealthCheck } = useApp();
+  const { startSystemHealthCheck, systemHealthCheckData } = useApp();
+
+  const [formattedJSON, setFormattedJSON] = useState(null);
+
+  useEffect(() => {
+    if (systemHealthCheckData) {
+      setFormattedJSON(JSON.stringify(systemHealthCheckData, null, 4));
+    } else {
+      setFormattedJSON(null);
+    }
+  }, [systemHealthCheckData, setFormattedJSON]);
 
   const handleSystemHealthClick = async () => {
     await startSystemHealthCheck();
@@ -14,6 +25,14 @@ const SystemHealthCheck = () => {
     <div>
       <p>System health check</p>
       <button onClick={handleSystemHealthClick}>Run System health check</button>
+      <div>
+        {formattedJSON && (
+          <textarea
+            className={styles.textarea}
+            value={formattedJSON}
+          ></textarea>
+        )}
+      </div>
     </div>
   );
 };
