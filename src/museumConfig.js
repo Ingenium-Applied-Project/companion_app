@@ -9,6 +9,7 @@ const config = {
             settings: {
               screen: 'self', //or could be url: 'self'
               title: undefined,
+              titleText: { en: undefined, fr: undefined },
               icon: {
                 type: 'solid',
                 name: 'location-dot',
@@ -19,7 +20,8 @@ const config = {
             type: 'text section',
             for: 'highlights',
             settings: {
-              title: { en: 'Highlights:', fr: 'Highlights (FR):' },
+              title: 'Highlights:',
+              titleText: { en: 'Highligts:', fr: 'Highlights (FR):' },
               collapsable: false,
             },
           },
@@ -27,7 +29,8 @@ const config = {
             type: 'media gallery section',
             for: 'image-gallery',
             settings: {
-              title: { en: 'Image Gallery:', fr: 'Image Gallery (FR):' },
+              title: 'Image Gallery:',
+              titleText: { en: 'Image Gallery:', fr: 'Image Gallery (FR):' },
               collapsable: false,
               descriptionMinimumLength: 30,
             },
@@ -36,7 +39,8 @@ const config = {
             type: 'text section',
             for: 'history',
             settings: {
-              title: { en: 'History:', fr: 'History (FR):' },
+              title: 'History:',
+              titleText: { en: 'History:', fr: 'History (FR):' },
               collapsable: false,
             },
           },
@@ -44,7 +48,8 @@ const config = {
             type: 'text section',
             for: 'provenance',
             settings: {
-              title: { en: 'Provenance:', fr: 'Provenance (FR)' },
+              title: 'Provenance:',
+              titleText: { en: 'Provenance:', fr: 'Provenance (FR):' },
               collapsable: false,
             },
           },
@@ -52,9 +57,10 @@ const config = {
             type: 'text section',
             for: 'technical-information',
             settings: {
-              title: {
+              title: 'Technical Information:',
+              titleText: {
                 en: 'Technical Information:',
-                fr: 'Technical Information(FR): ',
+                fr: 'Technical Information (FR):',
               },
               collapsable: false,
             },
@@ -64,6 +70,7 @@ const config = {
             for: 'airplane-model',
             settings: {
               title: undefined,
+              titleText: { en: undefined, fr: undefined },
               collapsable: false,
             },
           },
