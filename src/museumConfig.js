@@ -29,6 +29,7 @@ const config = {
             settings: {
               title: 'Image Gallery:',
               collapsable: false,
+              descriptionMinimumLength: 30,
             },
           },
           {

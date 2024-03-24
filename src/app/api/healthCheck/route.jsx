@@ -91,6 +91,7 @@ export async function GET(_) {
     console.log(promiseResults[1].length, 'screens printed');
     const endTime = Date.now();
     console.log(`Elapsed time ${endTime - startTime} miliseconds`);
+
     return NextResponse.json({
       message: 'GET request processed',
       responseData,
