@@ -400,14 +400,61 @@ class Screen {
       // Check if sections
       // const configContent = th
       const contentConfig = this.appConfig.feature.checkList.content || null;
+      const currentContentArray = this.data.sections;
       if (Array.isArray(contentConfig)) {
         let contentOrderIsGood = true;
+
         contentConfig.forEach((value, index, arr) => {
           // check if the order is correct
           const expectedSection = value.for; // 'location' | 'highlights etc
           const settings = value.settings;
+          const currentContentItem = currentContentArray[index];
+
           switch (expectedSection) {
             case 'location':
+              if (
+                currentContentItem &&
+                currentContentItem.section_type === 'link_group'
+              ) {
+                const { screen, titleText, icon } = settings;
+
+                // check if the location button is addressing self, with proper icons
+                if (screen && screen === 'self') {
+                  if (
+                    this.data.id !== currentContentItem.section_items[0].item_id
+                  ) {
+                    // the button does not address itself. it addresses another page.
+                    // TODO: Create an error
+                  }
+                }
+
+                const expectedTitle =
+                  titleText[this.health_check_language] || undefined;
+                if (expectedTitle !== currentContentItem.title) {
+                  // TODO: Expected title could not found
+                }
+
+                if (
+                  icon &&
+                  icon.name &&
+                  icon.name !==
+                    currentContentItem.section_items[0].stock_icon_icon
+                ) {
+                  // TODO: It'is not using the proper icon
+                }
+
+                if (
+                  icon &&
+                  icon.type &&
+                  icon.type !==
+                    currentContentItem.section_items[0].stock_icon_style
+                ) {
+                  // TODO: It'is not using the proper icon style
+                }
+              } else {
+                contentOrderIsGood = false;
+              }
+
               break;
             case 'highlights':
               break;
