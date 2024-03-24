@@ -86,7 +86,6 @@ const config = {
         },
       },
       checkOrder: ['audioGuides', 'artifacts'],
-      undefinedScreenTag: 'NOT_IDENTIFIED',
     },
     api: {
       baseUrl: 'https://app.mytoursapp.com/api/v3/',

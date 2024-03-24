@@ -12,4 +12,10 @@ const HeroImageDefaultsCASM = {
   defaultExportFormat: 'image/jpeg',
 };
 
-export { HeroImageDefaultsCASM, LocalStorageKeys };
+const StoryScreenTypes = {
+  AUDIO_GUIDE: 'Audio Guide',
+  ARTIFACT: 'Artifact',
+  NOT_IDENTIFIED: 'Screen Type Not Found',
+};
+
+export { HeroImageDefaultsCASM, LocalStorageKeys, StoryScreenTypes };

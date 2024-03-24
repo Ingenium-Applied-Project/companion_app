@@ -1,3 +1,4 @@
+import { StoryScreenTypes, StqryScreenTypes } from '@/constants/constants';
 import config from '@/museumConfig';
 import { writeDataToFile } from '@/utils/devUtils';
 import { NextResponse } from 'next/server';
@@ -317,6 +318,26 @@ class Collection {
   }
 }
 
+function searchTextArrayInText(targetText, searchStrings, checkType) {
+  // returns if it hits a match
+  if (!targetText || !searchStrings) return false;
+  if (typeof targetText !== 'string') return false;
+  if (!Array.isArray(searchStrings)) return false;
+
+  switch (checkType) {
+    case 'startsWith':
+      return searchStrings.some((searchString) =>
+        targetText.startsWith(searchString)
+      );
+    case 'includes':
+      return searchStrings.some((searchString) =>
+        targetText.includes(searchString)
+      );
+    default:
+      return false; // Or throw an error if you prefer
+  }
+}
+
 class Screen {
   healthReport = {};
 
@@ -324,11 +345,93 @@ class Screen {
     this.data = data; //story data
     this.health_check_language = data.health_check_language || null;
     this.appConfig = getConfig();
+    this.story_screen_type = StoryScreenTypes.NOT_IDENTIFIED;
 
-    // access to sections with this.data.sections
-    
+    const audioGuideRules =
+      this.appConfig.screenIdentifiers.rules.audioGuides || null;
+    const artifactScreenRules =
+      this.appConfig.screenIdentifiers.rules.artifacts || null;
+
+    //Must decide what kind of screen is that.
+    // 1st check if it is an audio screen.. If not, check if it is an artifact screen
+
+    if ((this.story_screen_type = StoryScreenTypes.NOT_IDENTIFIED)) {
+      if (audioGuideRules) {
+        if (
+          searchTextArrayInText(
+            data.name,
+            audioGuideRules.startWith,
+            'startWith'
+          ) &&
+          searchTextArrayInText(
+            data.name,
+            audioGuideRules.mustContain,
+            'includes'
+          )
+        ) {
+          this.story_screen_type = StoryScreenTypes.AUDIO_GUIDE;
+        }
+      }
+    }
+
+    if ((this.story_screen_type = StoryScreenTypes.NOT_IDENTIFIED)) {
+      if (artifactScreenRules) {
+        if (
+          searchTextArrayInText(
+            data.name,
+            artifactScreenRules.startWith,
+            'startWith'
+          ) &&
+          searchTextArrayInText(
+            data.name,
+            artifactScreenRules.mustContain,
+            'includes'
+          )
+        ) {
+          this.story_screen_type = StoryScreenTypes.ARTIFACT;
+        }
+      }
+    }
   }
-  check = () => {
+  check() {
+    // If not audio, then check if it is an artifact screen
+
+    if (this.story_screen_type === StoryScreenTypes.ARTIFACT) {
+      // Check if sections
+      // const configContent = th
+      const contentConfig = this.appConfig.feature.checkList.content || null;
+      if (Array.isArray(contentConfig)) {
+        let contentOrderIsGood = true;
+        contentConfig.forEach((value, index, arr) => {
+          // check if the order is correct
+          const expectedSection = value.for; // 'location' | 'highlights etc
+          const settings = value.settings;
+          switch (expectedSection) {
+            case 'location':
+              break;
+            case 'highlights':
+              break;
+            case 'image-gallery':
+              break;
+            case 'history':
+              break;
+            case 'provenance':
+              break;
+            case 'technical-information':
+              break;
+            case 'airplane-model':
+              break;
+          }
+        });
+      }
+    }
+
+    if (this.story_screen_type === StoryScreenTypes.AUDIO_GUIDE) {
+    }
+
+    if (this.story_screen_type === StoryScreenTypes.NOT_IDENTIFIED) {
+    }
+
     //check content first
     const checkListArr = this.appConfig.feature.checkList.content || null;
     if (checkListArr) {
@@ -336,7 +439,7 @@ class Screen {
         const { for: forSection } = element;
         switch (forSection) {
           case 'location':
-            const storySections = this.data.sections.filter(el => e,)
+            // const storySections = this.data.sections.filter((el) => e);
             break;
           case 'highlights':
             break;
@@ -353,7 +456,7 @@ class Screen {
         }
       });
     }
-  };
+  }
 
   getHealthReport() {
     this.healthReport.description = `Health report for ${this.id} and ${this.health_check_language}`;
