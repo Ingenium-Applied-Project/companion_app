@@ -92,6 +92,14 @@ export async function GET(_) {
     const endTime = Date.now();
     console.log(`Elapsed time ${endTime - startTime} miliseconds`);
 
+    if (
+      promiseResults[1] &&
+      Array.isArray(promiseResults[1]) &&
+      promiseResults[1].length > 0
+    ) {
+      // create
+    }
+
     return NextResponse.json({
       message: 'GET request processed',
       responseData,
@@ -410,5 +418,17 @@ class Screen {
     this.healthReport.description = `Health report for ${this.id} and ${this.health_check_language}`;
     this.healthReport.reportItems = [];
     return this.healthReport;
+  }
+}
+
+const HEALTH_CHECK_SEVERITY = {
+  LOW: 'low',
+  MEDIUM: 'medium',
+  HIGH: 'high',
+};
+class HealthCheckResult {
+  constructor(data) {
+    this.severity = data.severity || HEALTH_CHECK_SEVERITY.LOW;
+    this.
   }
 }

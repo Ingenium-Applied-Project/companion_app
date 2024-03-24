@@ -19,7 +19,7 @@ const config = {
             type: 'text section',
             for: 'highlights',
             settings: {
-              title: 'Highlights:',
+              title: { en: 'Highlights:', fr: 'Highlights (FR):' },
               collapsable: false,
             },
           },
@@ -27,7 +27,7 @@ const config = {
             type: 'media gallery section',
             for: 'image-gallery',
             settings: {
-              title: 'Image Gallery:',
+              title: { en: 'Image Gallery:', fr: 'Image Gallery (FR):' },
               collapsable: false,
               descriptionMinimumLength: 30,
             },
@@ -36,7 +36,7 @@ const config = {
             type: 'text section',
             for: 'history',
             settings: {
-              title: 'History:',
+              title: { en: 'History:', fr: 'History (FR):' },
               collapsable: false,
             },
           },
@@ -44,7 +44,7 @@ const config = {
             type: 'text section',
             for: 'provenance',
             settings: {
-              title: 'Provenance:',
+              title: { en: 'Provenance:', fr: 'Provenance (FR)' },
               collapsable: false,
             },
           },
@@ -52,7 +52,10 @@ const config = {
             type: 'text section',
             for: 'technical-information',
             settings: {
-              title: 'Technical Information:',
+              title: {
+                en: 'Technical Information:',
+                fr: 'Technical Information(FR): ',
+              },
               collapsable: false,
             },
           },
