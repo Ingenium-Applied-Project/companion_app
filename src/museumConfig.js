@@ -77,6 +77,17 @@ const config = {
         ],
       },
     },
+    screenIdentifiers: {
+      rules: {
+        audioGuides: { startWith: ['WA-'], mustContain: ['FullTour'] },
+        artifacts: {
+          startWith: ['WA-'],
+          mustContain: ['Exhibition'],
+        },
+      },
+      checkOrder: ['audioGuides', 'artifacts'],
+      undefinedScreenTag: 'NOT_IDENTIFIED',
+    },
     api: {
       baseUrl: 'https://app.mytoursapp.com/api/v3/',
       auth: {

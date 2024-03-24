@@ -1,4 +1,5 @@
 import config from '@/museumConfig';
+import { writeDataToFile } from '@/utils/devUtils';
 import { NextResponse } from 'next/server';
 
 // Returns app config for CASM
@@ -61,6 +62,12 @@ export async function GET(_) {
 
     let { collections, screens } = responseData;
 
+    //DEV only
+    await writeDataToFile(collections, 'collections.json');
+    await writeDataToFile(screens, 'screens.json');
+
+    //DEV
+
     //TODO: TEST for few elements only: Remove it later when the functionality is good
     if (collections && 1 === 1) {
       // collections = collections.slice(0, 10);
@@ -68,7 +75,7 @@ export async function GET(_) {
 
     //TODO: TEST for few elements only: Remove it later when the functionality is good
     if (screens && 1 === 1) {
-      // screens = screens.slice(0, 10);
+      screens = screens.slice(0, 30); //testing
     }
 
     // Create promises for each main functional area.
@@ -84,11 +91,14 @@ export async function GET(_) {
       collectionsHealthCheckPromise,
       screensHealthCheckPromise,
     ]);
-    console.log(promiseResults[0]);
-    console.log(promiseResults[1]);
+    // console.log(promiseResults[0]);
+    // console.log(promiseResults[1]);
 
-    console.log(promiseResults[0].length, 'collections printed');
-    console.log(promiseResults[1].length, 'screens printed');
+    // console.log(promiseResults[0].length, 'collections printed');
+    // console.log(promiseResults[1].length, 'screens printed');
+    await writeDataToFile(promiseResults[0], 'evaluatedCollections.json');
+    await writeDataToFile(promiseResults[1], 'evaluatedScreens.json');
+
     const endTime = Date.now();
     console.log(`Elapsed time ${endTime - startTime} miliseconds`);
 
@@ -98,11 +108,15 @@ export async function GET(_) {
       promiseResults[1].length > 0
     ) {
       // create
+      promiseResults.forEach((screenResult) => {
+        // console.log(screenResult);
+      });
     }
 
     return NextResponse.json({
       message: 'GET request processed',
-      responseData,
+      // responseData,
+      responseData: promiseResults[1],
     });
   } catch (error) {
     console.error(error);
@@ -214,6 +228,7 @@ const getScreenPromise = (payload) => {
           item: 'screen-health-check',
           error: null,
           data: obj,
+          storyData: responseData, //represents story data
         });
       })
       .catch((error) => {
@@ -222,6 +237,7 @@ const getScreenPromise = (payload) => {
           item: 'screen-health-check',
           error: error,
           data: null,
+          storyData: null, //represents story data
           errorStatus: error.status,
           id: id,
           version: version,
@@ -264,6 +280,7 @@ const getCollectionPromise = (payload) => {
           item: 'collection-health-check',
           error: null,
           data: obj, // represents the relevant data for our health check
+          storyData: responseData, //represents story data
         });
       })
       .catch((error) => {
@@ -272,6 +289,7 @@ const getCollectionPromise = (payload) => {
           item: 'collection-health-check',
           error: error,
           data: null,
+          storyData: null,
           errorStatus: error.status,
           id: id,
           version: version,
@@ -286,66 +304,8 @@ const getCollectionPromise = (payload) => {
 class Collection {
   healthReport = {};
   constructor(data) {
-    // console.log('data', data);
-    this.id = data.id;
-    this.version = data.version;
-    this.subtype = data.subtype;
+    this.data = data || null; // data from story
     this.health_check_language = data.health_check_language || null;
-    this.name = data.name || null;
-    this.description = data.description || null;
-    this.short_title = data.short_title || null;
-    this.tour_mode = data.tour_mode || null;
-    this.map_pin_color = data.map_pin_color || null;
-    this.map_pin_icon = data.map_pin_icon || null;
-    this.map_pin_style = data.map_pin_style || null;
-    this.length_min = data.length_min || null;
-    this.length_max = data.length_max || null;
-    this.cover_image = null;
-    this.cover_image_grid = null;
-    this.sections = [];
-
-    if (data.cover_image) {
-      this.cover_image = {
-        id: data.cover_image.id || null,
-        name: data.cover_image.name || null,
-        media_type: data.cover_image.media_type || null,
-        attribution: data.cover_image.attribution || null,
-        description: data.cover_image.description || null,
-        caption: data.cover_image.caption || '',
-        file_id: data.cover_image.file.id || null,
-        file_name: data.cover_image.filename || null,
-        file_content_type: data.cover_image.content_type || null,
-        file_size: data.cover_image.file_size || -1,
-        file_original_url: data.cover_image.original_url || null,
-        file_width: data.cover_image.width || -1,
-        file_height: data.cover_image.height || -1,
-      };
-    }
-
-    if (data.cover_image_grid) {
-      this.cover_image_grid = {
-        id: data.cover_image_grid.id || null,
-        name: data.cover_image_grid.name || null,
-        media_type: data.cover_image_grid.media_type || null,
-        attribution: data.cover_image_grid.attribution || null,
-        description: data.cover_image_grid.description || null,
-        caption: data.cover_image_grid.caption || '',
-        file_id: data.cover_image_grid.file.id || null,
-        file_name: data.cover_image_grid.filename || null,
-        file_content_type: data.cover_image_grid.content_type || null,
-        file_size: data.cover_image_grid.file_size || -1,
-        file_original_url: data.cover_image_grid.original_url || null,
-        file_width: data.cover_image_grid.width || -1,
-        file_height: data.cover_image_grid.height || -1,
-      };
-    }
-
-    if (data.sections) {
-      const { sections } = data.sections;
-      if (Array.isArray(sections) && sections.length > 0) {
-        this.sections = sections;
-      }
-    }
   }
   check() {
     //TODO: Check current collection against the rules.
@@ -359,61 +319,42 @@ class Collection {
 
 class Screen {
   healthReport = {};
+
   constructor(data) {
-    // console.log('data', data);
-    this.id = data.id;
-    this.version = data.version;
-    this.screen_type = data.screen_type; //story | x | y | z
+    this.data = data; //story data
     this.health_check_language = data.health_check_language || null;
-    this.name = data.name; //e.g. WA-SU-ExhibitionK-ColdWar-MikoyanGurevichMigLim2
-    this.title = data.title || ''; //WSK Lim-2 (Mikoyan-Gurevich MiG- 15bis)
-    this.short_title = data.short_title || ''; //WSK Lim-2 (Mikoyan-Gurevich MiG- 15bis)
-    this.header_layout = data.header_layout || null; // image_and_title | x
-    this.map_pin_color = data.map_pin_color || null;
-    this.map_pin_icon = data.map_pin_icon || null;
-    this.map_pin_style = data.map_pin_style || null;
-    this.cover_image = null;
-    this.cover_image_grid = null;
+    this.appConfig = getConfig();
 
-    if (data.cover_image) {
-      this.cover_image = {
-        id: data.cover_image.id || null,
-        name: data.cover_image.name || null,
-        media_type: data.cover_image.media_type || null,
-        attribution: data.cover_image.attribution || null,
-        description: data.cover_image.description || null,
-        caption: data.cover_image.caption || '',
-        file_id: data.cover_image.file.id || null,
-        file_name: data.cover_image.filename || null,
-        file_content_type: data.cover_image.content_type || null,
-        file_size: data.cover_image.file_size || -1,
-        file_original_url: data.cover_image.original_url || null,
-        file_width: data.cover_image.width || -1,
-        file_height: data.cover_image.height || -1,
-      };
+    // access to sections with this.data.sections
+    
+  }
+  check = () => {
+    //check content first
+    const checkListArr = this.appConfig.feature.checkList.content || null;
+    if (checkListArr) {
+      checkListArr.forEach((element) => {
+        const { for: forSection } = element;
+        switch (forSection) {
+          case 'location':
+            const storySections = this.data.sections.filter(el => e,)
+            break;
+          case 'highlights':
+            break;
+          case 'image-gallery':
+            break;
+          case 'history':
+            break;
+          case 'provenance':
+            break;
+          case 'technical-information':
+            break;
+          case 'airplane-model':
+            break;
+        }
+      });
     }
+  };
 
-    if (data.cover_image_grid) {
-      this.cover_image_grid = {
-        id: data.cover_image_grid.id || null,
-        name: data.cover_image_grid.name || null,
-        media_type: data.cover_image_grid.media_type || null,
-        attribution: data.cover_image_grid.attribution || null,
-        description: data.cover_image_grid.description || null,
-        caption: data.cover_image_grid.caption || '',
-        file_id: data.cover_image_grid.file.id || null,
-        file_name: data.cover_image_grid.filename || null,
-        file_content_type: data.cover_image_grid.content_type || null,
-        file_size: data.cover_image_grid.file_size || -1,
-        file_original_url: data.cover_image_grid.original_url || null,
-        file_width: data.cover_image_grid.width || -1,
-        file_height: data.cover_image_grid.height || -1,
-      };
-    }
-  }
-  check() {
-    //TODO: Check current collection against the rules.
-  }
   getHealthReport() {
     this.healthReport.description = `Health report for ${this.id} and ${this.health_check_language}`;
     this.healthReport.reportItems = [];
@@ -426,9 +367,30 @@ const HEALTH_CHECK_SEVERITY = {
   MEDIUM: 'medium',
   HIGH: 'high',
 };
+
+const HEALTH_CHECK_DESCRIPTIONS = {
+  //TODO: Add options
+};
+
+const HEALTH_CHECK_SUGGESTIONS = {
+  //TODO: Add options
+};
 class HealthCheckResult {
   constructor(data) {
     this.severity = data.severity || HEALTH_CHECK_SEVERITY.LOW;
-    // this.
   }
+
+  createHealthCheckResult = (payload) => {
+    const {
+      severity = HEALTH_CHECK_SEVERITY.LOW,
+      description = 'No Description',
+      suggestion = 'No suggestion',
+    } = payload;
+
+    return {
+      severity: severity,
+      description: description,
+      suggestion: suggestion,
+    };
+  };
 }
