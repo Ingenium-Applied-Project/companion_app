@@ -429,6 +429,6 @@ const HEALTH_CHECK_SEVERITY = {
 class HealthCheckResult {
   constructor(data) {
     this.severity = data.severity || HEALTH_CHECK_SEVERITY.LOW;
-    this.
+    // this.
   }
 }
