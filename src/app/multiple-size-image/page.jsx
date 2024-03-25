@@ -1,5 +1,9 @@
-function MultipleSizeImage() {
-  return <div>MultipleSizeImage</div>;
-}
+import MultipleSizeImage from '@/components/MultipleSizeImage/MultipleSizeImage';
 
-export default MultipleSizeImage;
+export default function MultipleSizeImageRoute() {
+  return (
+    <div>
+      <MultipleSizeImage />
+    </div>
+  );
+}
