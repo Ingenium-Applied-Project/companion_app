@@ -4,7 +4,7 @@ const config = {
       checkList: {
         content: [
           {
-            type: 'link',
+            type: 'links or buttons section',
             for: 'location',
             settings: {
               screen: 'self', //or could be url: 'self'
@@ -16,7 +16,7 @@ const config = {
             },
           },
           {
-            type: 'text',
+            type: 'text section',
             for: 'highlights',
             settings: {
               title: 'Highlights:',
@@ -24,7 +24,7 @@ const config = {
             },
           },
           {
-            type: 'image gallery',
+            type: 'media gallery section',
             for: 'image-gallery',
             settings: {
               title: 'Image Gallery:',
@@ -32,7 +32,7 @@ const config = {
             },
           },
           {
-            type: 'text',
+            type: 'text section',
             for: 'history',
             settings: {
               title: 'History:',
@@ -40,7 +40,7 @@ const config = {
             },
           },
           {
-            type: 'text',
+            type: 'text section',
             for: 'provenance',
             settings: {
               title: 'Provenance:',
@@ -48,7 +48,7 @@ const config = {
             },
           },
           {
-            type: 'text',
+            type: 'text section',
             for: 'technical-information',
             settings: {
               title: 'Technical Information:',
@@ -66,6 +66,28 @@ const config = {
         ],
       },
     },
+    api: {
+      baseUrl: 'https://app.mytoursapp.com/api/v3/',
+      auth: {
+        username: '8919',
+        password: 'f313a575-e87e-45b4-88ef-43445071f0da',
+        legacy_app_id: '9403',
+      },
+      headers: {
+        HTTP_STQRY_PROJECT_TYPE: 'app',
+      },
+      endPoints: {
+        rootProject: 'project',
+        project: 'project/manifest',
+        collections: 'collections/:id/:language/:version/',
+        screens: 'screens/:id/:language/:version',
+        media_items: 'media_items/:id',
+      },
+    },
+    languages: [
+      { code: 'en', name: 'English' },
+      { code: 'fr', name: 'French' },
+    ],
   },
   MUSEUM2: {},
   MUSEUM3: {},

@@ -37,7 +37,7 @@ Context in React provides a way to share state and functions across components w
 3.  Wrap Your App with the Provider. Wrap your entire application or the relevant part of it with the provider component.
 4.  Consume the Context in Components. Use the useContext hook to consume the context in your components. Import the context and use it within your components as needed.
 
-5.  Naming Convention - Suggestion 1
+5.  Naming Convention
 
 **Always use meaningful names**
 
@@ -46,15 +46,6 @@ Context in React provides a way to share state and functions across components w
 - Component style use `Pascal` with `dot notation`. Eg, `Button.modules.css`. Every css file for component should include `.module.css`.
 - Hooks must use `camel` case and have the prefix `use`. Eg, `useSearch.jsx`.
 - Providers must use `camel` case and have the suffix `Provider`. Eg, `searchProvider.jsx`.
-- [Resource One](https://medium.com/@mirazhs/naming-conventions-in-next-js-boosting-seo-and-code-maintainability-d4150fe7e6e#:~:text=In%20NextJS%2C%20it%20is%20recommended,js%20%2C%20use%20about%2Dus.). [Resource Two](https://medium.com/@hiro08gh/next-js-naming-conventions-are-checked-with-eslint-rules-946371d67882).
-
-5. Naming Convention - Suggestion 2
-
-**Always use meaningful names**
-
-- Non-React Folders and Files: `Kebab`. Eg for files, `app.jsx`, `my-container.jsx`. Eg for folders, `app`, `my-container`.
-- React (inside components folder): `PascalCase`. Eg, `App`, `MyContainer`
-- Component style use `dot notation`. Eg, `style.modules.css`
 - [Resource One](https://medium.com/@mirazhs/naming-conventions-in-next-js-boosting-seo-and-code-maintainability-d4150fe7e6e#:~:text=In%20NextJS%2C%20it%20is%20recommended,js%20%2C%20use%20about%2Dus.). [Resource Two](https://medium.com/@hiro08gh/next-js-naming-conventions-are-checked-with-eslint-rules-946371d67882).
 
 6. Exports from files can be either as variable or default exports, but please stick to naming the object before using `export default` to avoid anonymous module names in stack traces and React dev tools.
