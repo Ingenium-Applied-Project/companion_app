@@ -43,8 +43,16 @@ function MultipleSizeImage() {
     downloadModifiedHeroImage,
   } = useApp();
 
+  useEffect(() => {
+    if (modifiedHeroImage) {
+      setCrop(undefined); // Makes crop preview update between images.
+      setImgSrc(modifiedHeroImage);
+    }
+  }, [modifiedHeroImage]);
+
   const handleHeroImageUpload = async (e) => {
     if (e.target.files && e.target.files[0]) {
+      console.log(e.target.files);
       await setHeroSourceImage({ image: e.target.files[0] });
     }
   };
@@ -88,7 +96,6 @@ function MultipleSizeImage() {
   }
 
   function onSelectFile(e) {
-    console.log('on image load:');
     if (e.target.files && e.target.files.length > 0) {
       setCrop(undefined); // Makes crop preview update between images.
       const reader = new FileReader();
@@ -200,7 +207,11 @@ function MultipleSizeImage() {
 
       {/* Upload Button */}
       <div>
+        <label htmlFor="hero-image-upload">
+          Upload image to add gradient and crop
+        </label>
         <input
+          id="hero-image-upload"
           type="file"
           onChange={handleHeroImageUpload}
           accept="image/*"
@@ -227,7 +238,11 @@ function MultipleSizeImage() {
 
       <div>
         <div>
-          <input type="file" accept="image/*" onChange={onSelectFile} />
+          {/* <input
+            type="file"
+            accept="image/*"
+            onChange={handleHeroImageUpload}
+          /> */}
           <div>
             <label htmlFor="scale-input">Scale: </label>
             <input
@@ -239,7 +254,8 @@ function MultipleSizeImage() {
               onChange={(e) => setScale(Number(e.target.value))}
             />
           </div>
-          <div>
+
+          {/* <div>
             <label htmlFor="rotate-input">Rotate: </label>
             <input
               id="rotate-input"
@@ -250,7 +266,8 @@ function MultipleSizeImage() {
                 setRotate(Math.min(180, Math.max(-180, Number(e.target.value))))
               }
             />
-          </div>
+          </div> */}
+
           <div>
             <button onClick={handleToggleAspectClick}>
               Toggle aspect {aspect ? 'off' : 'on'}
