@@ -225,18 +225,18 @@ const FileGenerator = () => {
           <div className="mediaFormat">
             <label>Format</label>
             <select value={format} onChange={handleFormat}>
-              <option value="gif">.gif</option>
-              <option value="webp">.webp</option>
-              <option value="apng">.apng</option>
-              <option value="bmp">.bmp</option>
-              <option value="jpg">.jpg</option>
-              <option value="jpeg">.jpeg</option>
-              <option value="png">.png</option>
-              <option value="webp">.webp</option>
-              <option value="raw">.raw</option>
-              <option value="tiff">.tiff</option>
-              <option value="heic">.heic</option>
-              <option value="heif">.heif</option>
+              <option value="gif">gif</option>
+              <option value="webp">webp</option>
+              <option value="apng">apng</option>
+              <option value="bmp">bmp</option>
+              <option value="jpg">jpg</option>
+              <option value="jpeg">jpeg</option>
+              <option value="png">png</option>
+              <option value="webp">webp</option>
+              <option value="raw">raw</option>
+              <option value="tiff">tiff</option>
+              <option value="heic">heic</option>
+              <option value="heif">heif</option>
             </select>
           </div>
         </div>
