@@ -39,6 +39,7 @@ const FileGenerator = () => {
   const [areaName, setAreaName] = useState(''); // eslint-disable-line no-unused-vars
   const [aircraft, setAircraft] = useState(''); // eslint-disable-line no-unused-vars
   const [language, setLanguage] = useState('EN'); // eslint-disable-line no-unused-vars
+  const [format, setFormat] = useState('');
   const [fullFileName, setFullFileName] = useState(''); // eslint-disable-line no-unused-vars
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -64,6 +65,10 @@ const FileGenerator = () => {
     setLanguage(e.target.value);
   };
 
+  const handleFormat = (e) => {
+    setFormat(e.target.value);
+  };
+
   const handleFullFileNameChange = (e) => {
     setFullFileName(e.target.value);
   };
@@ -78,7 +83,7 @@ const FileGenerator = () => {
 
   const handleGenerateImageFileName = () => {
     const fileName =
-      `WA-${selectedArea}-${areaName}-${language}-${aircraft}`.replace(
+      `WA-${selectedArea}-${areaName}-${aircraft}-${language}.${format}`.replace(
         /\s+/g,
         ''
       );
@@ -87,7 +92,7 @@ const FileGenerator = () => {
 
   const handleGenerateAudioFileName = () => {
     const fileName =
-      `WA-${selectedArea}-${areaName}-${language}-${aircraft}`.replace(
+      `WA-${selectedArea}-${areaName}-${aircraft}-${language}.${format}`.replace(
         /\s+/g,
         ''
       );
@@ -204,6 +209,7 @@ const FileGenerator = () => {
             <select value={language} onChange={handleLanguage}>
               <option value="EN">EN</option>
               <option value="FR">FR</option>
+              <option value="BI">BI</option>
             </select>
           </div>
 
@@ -214,6 +220,24 @@ const FileGenerator = () => {
               value={aircraft}
               onChange={handleAircraftChange}
             />
+          </div>
+
+          <div className="mediaFormat">
+            <label>Format</label>
+            <select value={format} onChange={handleFormat}>
+              <option value="gif">.gif</option>
+              <option value="webp">.webp</option>
+              <option value="apng">.apng</option>
+              <option value="bmp">.bmp</option>
+              <option value="jpg">.jpg</option>
+              <option value="jpeg">.jpeg</option>
+              <option value="png">.png</option>
+              <option value="webp">.webp</option>
+              <option value="raw">.raw</option>
+              <option value="tiff">.tiff</option>
+              <option value="heic">.heic</option>
+              <option value="heif">.heif</option>
+            </select>
           </div>
         </div>
         <div className="fullFileInput">
@@ -259,6 +283,7 @@ const FileGenerator = () => {
             <select value={language} onChange={handleLanguage}>
               <option value="EN">EN</option>
               <option value="FR">FR</option>
+              <option value="BI">BI</option>
             </select>
           </div>
 
@@ -269,6 +294,26 @@ const FileGenerator = () => {
               value={aircraft}
               onChange={handleAircraftChange}
             />
+          </div>
+
+          <div className="mediaFormat">
+            <label>Format</label>
+            <select value={format} onChange={handleFormat}>
+              <option value="aac">aac</option>
+              <option value="ac3">ac3</option>
+              <option value="aif">aif</option>
+              <option value="aiff">aiff</option>
+              <option value="flac">flac</option>
+              <option value="m4a">m4a</option>
+              <option value="x-m4a">x-m4a</option>
+              <option value="mp3">mp3</option>
+              <option value="mpa">mpa</option>
+              <option value="oga">oga</option>
+              <option value="ogg">ogg</option>
+              <option value="wav">wav</option>
+              <option value="wma">wma</option>
+              <option value="mpeg">mpeg</option>
+            </select>
           </div>
         </div>
 
