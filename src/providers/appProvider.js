@@ -295,12 +295,17 @@ function AppProvider({ children }) {
         throw new Error('Failed to fetch health check. ', response.status);
       }
       const data = await response.json();
-      setSystemHealthCheckData(data);
-      console.log(data);
+      const { responseData } = data;
+      if (responseData && Array.isArray(responseData)) {
+        setSystemHealthCheckData(responseData);
+      } else {
+        setSystemHealthCheckData([]);
+      }
       setSystemHealthCheckRunning(false);
     } catch (error) {
       console.error(error);
       setSystemHealthCheckRunning(false);
+      setSystemHealthCheckData([]);
     }
   };
 

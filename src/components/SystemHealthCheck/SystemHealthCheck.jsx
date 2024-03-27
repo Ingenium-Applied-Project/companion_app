@@ -35,6 +35,7 @@ const SystemHealthCheck = () => {
         {!systemHealthCheckRunning && 'Run System health check'}
         {systemHealthCheckRunning && 'System health check running'}
       </button>
+      <div></div>
       <div>
         {formattedJSON && (
           <textarea
