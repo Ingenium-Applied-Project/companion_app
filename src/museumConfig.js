@@ -76,7 +76,11 @@ const config = {
           },
         ],
       },
+      globalCheckList: {
+        imageDescriptionMinimumLength: 30,
+      },
     },
+
     screenIdentifiers: {
       rules: {
         audioGuides: { startWith: ['WA-'], mustContain: ['FullTour'] },
