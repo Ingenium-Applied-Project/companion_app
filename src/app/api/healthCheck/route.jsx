@@ -7,7 +7,7 @@ import {
 } from '@/constants/constants';
 import config from '@/museumConfig';
 import { extractTextFromHTML } from '@/utils/api/apiUtils';
-import { writeDataToFile } from '@/utils/devUtils';
+// import { writeDataToFile } from '@/utils/devUtils';
 import {
   booleanToString,
   compareBool,
