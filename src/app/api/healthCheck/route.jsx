@@ -852,8 +852,6 @@ class Screen {
       // check config array once
 
       if (Array.isArray(checkListContent)) {
-        let contentOrderIsGood = true;
-
         checkListContent.forEach((value, index) => {
           // check if the order is correct
           const expectedSection = value.for; // 'location' | 'highlights etc
@@ -1158,13 +1156,6 @@ const HEALTH_CHECK_SEVERITY = {
   HIGH: 'high',
 };
 
-const HEALTH_CHECK_DESCRIPTIONS = {
-  //TODO: Add options
-};
-
-const HEALTH_CHECK_SUGGESTIONS = {
-  //TODO: Add options
-};
 class HealthCheckResult {
   constructor(data) {
     this.severity = data.severity || HEALTH_CHECK_SEVERITY.LOW;
