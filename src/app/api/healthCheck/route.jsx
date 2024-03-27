@@ -1141,9 +1141,11 @@ class Screen {
     }
 
     if (this.story_screen_type === StoryScreenTypes.AUDIO_GUIDE) {
+      // TODO: handle audio guide files
     }
 
     if (this.story_screen_type === StoryScreenTypes.NOT_IDENTIFIED) {
+      // TODO: handle non-idendified screens
     }
 
     //check content first
