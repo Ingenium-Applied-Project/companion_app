@@ -1,14 +1,52 @@
-import { StoryScreenTypes, StqryScreenTypes } from '@/constants/constants';
+import {
+  ApiConstants,
+  HealthCheckErrorCodes,
+  HealthCheckErrorDescriptions,
+  StoryScreenTypes,
+} from '@/constants/constants';
 import config from '@/museumConfig';
 import { writeDataToFile } from '@/utils/devUtils';
+import { getErrorMessage } from '@/utils/utils';
 import { NextResponse } from 'next/server';
 
-// Returns app config for CASM
+/** GENERAL INFORMATION
+ 
+  The Story API call uses Promise.all() .. Even if there is an error condition, the backend does not throw and error. 
+  Instead, it "resolves" the promise with an error-code. This means the backend continues working on the successfully 
+  retrieved screens. 
+
+  A successful return for a screen is below: 
+   {
+          status: ApiConstants.success,
+          item: ApiConstants.screen_health_check,
+          id: id,
+          version: version,
+          error: null,
+          data: screenObject,
+    }
+    data object above contains all the information about the story-object. It is an instance of the "Screen" or "Collection" object
+
+
+
+  An error is handled with another object
+  {
+          status: ApiConstants.error,
+          item: ApiConstants.screen_health_check,
+          id: id,
+          version: version,
+          error: error,
+          data: null,
+          errorStatus: error.status,
+  }
+  As opposed to the success, this object has an error object with a non-null value, and its data object is null. 
+*/
+
+// Returns app config for CASM. Check museumConfig.js
 const getConfig = (app = 'CASM') => {
   return config[app] || {};
 };
 
-// Used in the original entry point in order to get initial access to STORY end point.
+// Used in the initial GET, in order to get initial access to STORY end point.
 const getRequestHeaders = () => {
   const appConfig = getConfig();
   const { auth, headers } = appConfig.api;
@@ -19,7 +57,7 @@ const getRequestHeaders = () => {
 };
 
 // Used in further fetch requests to get more detailed access.
-// This has a different username than getRequestHeaders function
+// Note that this  has a different username than getRequestHeaders function
 const getLegacyAppRequestHeaders = () => {
   const appConfig = getConfig();
   const { auth, headers } = appConfig.api;
@@ -34,8 +72,30 @@ export async function POST(req) {
   return NextResponse.json({ message: 'POST request processed' });
 }
 
-// This method returns the health-check result.
-// It fetches every collection and screen, per language (en and fr) and returns a detailed report.
+/**
+  This method returns the health-check result. It returns only the screens that have problems. Here is step by step what it does
+
+  - Makes an initial GET request for access. This returns all screen and collection entries from backend. 
+    Both screen and collection objects are in this format: 
+      {
+        "id": 25352,
+        "version": 1711427388
+      },
+
+
+  - by using the object array previously retrieved, it creates two promises:
+      collectionsHealthCheckPromise: A promises that returns collection data as an array
+      screensHealthCheckPromise: Another promise returning screen data as an array
+    These two promises above uses the appConfig.languages array to make 2 calls per screen: One for english and one for French. 
+    These promises return an array objects that's mentioned at the top of the code. 
+    
+    Whenever a screen is retrieved, the backend does the following:
+     - It creates a "Screen" object. The constructor defines whether this is an audio-tour, an artifact screen, or a not-defined screen. 
+     - once the object is created, check() method is called on the object. This method basically does all the checking on the object. 
+
+
+ */
+
 export async function GET(_) {
   const appConfig = getConfig();
 
@@ -63,13 +123,12 @@ export async function GET(_) {
 
     let { collections, screens } = responseData;
 
-    //DEV only
-    await writeDataToFile(collections, 'collections.json');
-    await writeDataToFile(screens, 'screens.json');
+    // DEV-ONLY +
+    // screens = screens.filter((screen) => screen.id === 250265);
 
-    //DEV
+    // await writeDataToFile(collections, 'raw-collections.json');
+    // await writeDataToFile(screens, 'raw-screens.json');
 
-    //TODO: TEST for few elements only: Remove it later when the functionality is good
     if (collections && 1 === 1) {
       // collections = collections.slice(0, 10);
     }
@@ -78,46 +137,61 @@ export async function GET(_) {
     if (screens && 1 === 1) {
       screens = screens.slice(0, 30); //testing
     }
+    // DEV-ONLY -
 
-    // Create promises for each main functional area.
-    // - collections
-    // - screens
-
+    const startTime = Date.now();
     const collectionsHealthCheckPromise =
       getCollectionsHealthCheckPromise(collections);
     const screensHealthCheckPromise = getScreensHealthCheckPromise(screens);
 
-    const startTime = Date.now();
     const promiseResults = await Promise.all([
       collectionsHealthCheckPromise,
       screensHealthCheckPromise,
     ]);
-    // console.log(promiseResults[0]);
-    // console.log(promiseResults[1]);
 
-    // console.log(promiseResults[0].length, 'collections printed');
-    // console.log(promiseResults[1].length, 'screens printed');
-    await writeDataToFile(promiseResults[0], 'evaluatedCollections.json');
-    await writeDataToFile(promiseResults[1], 'evaluatedScreens.json');
-
+    // DEV-ONLY +
+    // await writeDataToFile(promiseResults[0], 'result-Collections.json');
+    // await writeDataToFile(promiseResults[1], 'result-Screens.json');
     const endTime = Date.now();
-    console.log(`Elapsed time ${endTime - startTime} miliseconds`);
+    // console.log(`Elapsed time ${endTime - startTime} miliseconds`);
+    // DEV-ONLY -
 
-    if (
-      promiseResults[1] &&
-      Array.isArray(promiseResults[1]) &&
-      promiseResults[1].length > 0
-    ) {
-      // create
-      promiseResults.forEach((screenResult) => {
-        // console.log(screenResult);
-      });
-    }
+    // remove all  non-issues
+    const badScreens = promiseResults[1].filter((screenResult) => {
+      if (Array.isArray(screenResult.data.healthReport.reportItems)) {
+        return screenResult.data.healthReport.reportItems.length > 0;
+      }
+      return false;
+    });
+
+    console.log('badScreens.count', badScreens.length);
+
+    const badScreenResult = badScreens.map((badScreen) => {
+      const {
+        id = '',
+        version = '',
+        name = '',
+        title = '',
+        screenViewUrl = '',
+        screenEditUrl = '',
+        healthReport,
+      } = badScreen.data;
+
+      return {
+        id,
+        version,
+        name,
+        title,
+        screenEditUrl,
+        screenViewUrl,
+        healthReport: healthReport.reportItems || [],
+      };
+    });
 
     return NextResponse.json({
       message: 'GET request processed',
       // responseData,
-      responseData: promiseResults[1],
+      responseData: badScreenResult,
     });
   } catch (error) {
     console.error(error);
@@ -162,6 +236,19 @@ const getCollectionsHealthCheckPromise = (collections) => {
   });
 };
 
+/*
+getScreensHealthCheckPromise
+
+- This function retrieves every screen from the story backend (based on given screen array)
+- Each screen is fetched per language (one fetch for en, another for fr)
+- Upon successful fetch, a "Screen" object is created and the "check()" function is called.
+  check function compares object data against the checkList settings in museumConfig.js
+
+- Once each screen is checked internally, this function would have a list of screens in both french and english
+  So it also checks whether French and English content are same for the same content. If there is same text content, then
+  then this creates an error report as well. 
+
+*/
 const getScreensHealthCheckPromise = (screens) => {
   const appConfig = getConfig();
 
@@ -172,7 +259,11 @@ const getScreensHealthCheckPromise = (screens) => {
       resolve([]);
     }
 
+    // This array contains all the promises (where each promise indicates a screen in either french or english)
+    // And they are fetched with a Promise.all() later
     const healthCheckPromiseArray = [];
+
+    // Build the promise array
     if (Array.isArray(screens) && screens.length > 0) {
       screens.forEach((screen) => {
         languages.forEach((lang) => {
@@ -189,6 +280,211 @@ const getScreensHealthCheckPromise = (screens) => {
 
       Promise.all(healthCheckPromiseArray)
         .then((results) => {
+          // When they are all fetched, the backend already knows which screen has which internal problem (such as missing text)
+          // Now it is time to test to make sure English and French versions have different content
+
+          if (Array.isArray(screens) && screens.length > 0) {
+            screens.forEach((screen) => {
+              // screenMultiLangArr contains different languages for the same screen
+              const screenMultiLangArr = results.filter((result) => {
+                return (
+                  result.status === ApiConstants.success &&
+                  result.id === screen.id
+                );
+              });
+
+              // Loop through screens where we have the successful data
+              // if the array has 3 screens, 1st screen is compared to 2nd and 3rd screen.
+              // then the 2nd screen is only compared to 3rd screen.
+              // Note that the Screen data is available in the .data property as you can see below
+              if (screenMultiLangArr && !Array.isArray(screenMultiLangArr)) {
+                for (let i = 0; i < screenMultiLangArr.length; i++) {
+                  const page1 = screenMultiLangArr[i];
+                  for (let j = i + 1; j < screenMultiLangArr.length; j++) {
+                    const page2 = screenMultiLangArr[i];
+
+                    let value1 = '';
+                    let value2 = '';
+
+                    // Hero image description must be unique per language
+                    value1 = page1.data.cover_image.description || null;
+                    value2 = page2.data.cover_image.description || null;
+                    if (value1 && value2 && compareText(value1, value2)) {
+                      // add an error to page 1
+                      page1.addHealthCheckError({
+                        severity: HEALTH_CHECK_SEVERITY.HIGH,
+                        description: getErrorMessage(
+                          HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
+                          [
+                            page1.data.name,
+                            'Cover Image Description',
+                            page1.health_check_language,
+                            page2.health_check_language,
+                          ]
+                        ),
+                      });
+                      // add an error to page 2
+                      page2.addHealthCheckError({
+                        severity: HEALTH_CHECK_SEVERITY.HIGH,
+                        description: getErrorMessage(
+                          HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
+                          [
+                            page2.data.name,
+                            'Cover Image Description',
+                            page2.health_check_language,
+                            page1.health_check_language,
+                          ]
+                        ),
+                      });
+                    }
+
+                    // Check the square image description between languages
+                    value1 = page1.data.cover_image_grid.description || null;
+                    value2 = page2.data.cover_image_grid.description || null;
+                    if (value1 && value2 && compareText(value1, value2)) {
+                      // add an error to page 1
+                      page1.addHealthCheckError({
+                        severity: HEALTH_CHECK_SEVERITY.HIGH,
+                        description: getErrorMessage(
+                          HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
+                          [
+                            page1.data.name,
+                            'Cover Square Image Description',
+                            page1.health_check_language,
+                            page2.health_check_language,
+                          ]
+                        ),
+                      });
+
+                      // add an error to page 2
+                      page2.addHealthCheckError({
+                        severity: HEALTH_CHECK_SEVERITY.HIGH,
+                        description: getErrorMessage(
+                          HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
+                          [
+                            page2.data.name,
+                            'Cover Square Image Description',
+                            page2.health_check_language,
+                            page1.health_check_language,
+                          ]
+                        ),
+                      });
+                    }
+
+                    // In Story platform, sections are indentical in order.
+                    // If you remove a section, it is removed in the other language too.
+                    // However, this is not the case for image galleries
+                    // English image gallery can have 3 images, where as French might have 2 images.
+
+                    // get all screen elements from two target page data
+                    const sections1 = page1.data.sections;
+                    const sections2 = page2.data.sections;
+
+                    if (Array.isArray(sections1)) {
+                      for (let idx = 0; idx < sections1.length; idx++) {
+                        const section1Element = sections1[idx];
+                        const section2Element = sections2[idx];
+
+                        // if the current type is "text", different languages must have different content
+                        if (section1Element.type === 'text') {
+                          if (section1Element.body === section2Element.body) {
+                            // add an error to page 1
+                            page1.addHealthCheckError({
+                              severity: HEALTH_CHECK_SEVERITY.HIGH,
+                              description: getErrorMessage(
+                                HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
+                                [
+                                  page1.data.name,
+                                  section1Element.title || 'Not found',
+                                  page1.health_check_language,
+                                  page2.health_check_language,
+                                ]
+                              ),
+                            });
+                            // add an error to page 2
+                            page2.addHealthCheckError({
+                              severity: HEALTH_CHECK_SEVERITY.HIGH,
+                              description: getErrorMessage(
+                                HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
+                                [
+                                  page2.data.name,
+                                  section2Element.title || 'Not found',
+                                  page2.health_check_language,
+                                  page1.health_check_language,
+                                ]
+                              ),
+                            });
+                          }
+                        }
+
+                        // if it is a media gallery, then the number of images can be different.
+                        // And we know that each image must have a different Description, so images
+                        // are compared one by one according to their array size.
+                        if (section1Element.type === 'media_group') {
+                          const section1Images = section1Element.section_items;
+                          const section2Images = section2Element.section_items;
+
+                          if (
+                            Array.isArray(section1Images) &&
+                            Array.isArray(section2Images)
+                          ) {
+                            section1Images.forEach((section1Img) => {
+                              section2Images.forEach((section2Img) => {
+                                const section1Description =
+                                  section1Img.description;
+                                const section2Description =
+                                  section2Img.description;
+
+                                if (
+                                  section1Description &&
+                                  section2Description
+                                ) {
+                                  if (
+                                    section1Description === section2Description
+                                  ) {
+                                    // add an error to page 1
+                                    page1.addHealthCheckError({
+                                      severity: HEALTH_CHECK_SEVERITY.HIGH,
+                                      description: getErrorMessage(
+                                        HealthCheckErrorCodes.DUPLICATE_IMAGE_DESCRIPTION_MULTI,
+                                        [
+                                          page1.data.name,
+                                          section1Images.name || 'Not found',
+                                          page1.health_check_language,
+                                          page2.health_check_language,
+                                        ]
+                                      ),
+                                    });
+                                    // add an error to page 2
+                                    page2.addHealthCheckError({
+                                      severity: HEALTH_CHECK_SEVERITY.HIGH,
+                                      description: getErrorMessage(
+                                        HealthCheckErrorCodes.DUPLICATE_IMAGE_DESCRIPTION_MULTI,
+                                        [
+                                          page2.data.name,
+                                          section2Images.name || 'Not found',
+                                          page2.health_check_language,
+                                          page1.health_check_language,
+                                        ]
+                                      ),
+                                    });
+                                  }
+                                }
+                              });
+                            });
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          }
+
+          // having all the screen objects, resolve them all.
+          // Note that we could have resolved only the ones with issues, but we don't know if we
+          // are going to check additional stuff after this. So it is better to return it all
           resolve(results);
         })
         .catch(() => {
@@ -223,25 +519,27 @@ const getScreenPromise = (payload) => {
       .then((responseData) => {
         responseData.health_check_language = health_check_language;
         // console.log('raw screen sections', responseData.sections);
-        const obj = new Screen(responseData);
+        const screenObject = new Screen(responseData);
+        screenObject.check();
+
         resolve({
-          status: 'success',
-          item: 'screen-health-check',
+          status: ApiConstants.success,
+          item: ApiConstants.screen_health_check,
+          id: id,
+          version: version,
           error: null,
-          data: obj,
-          storyData: responseData, //represents story data
+          data: screenObject,
         });
       })
       .catch((error) => {
         resolve({
-          status: 'error',
-          item: 'screen-health-check',
-          error: error,
-          data: null,
-          storyData: null, //represents story data
-          errorStatus: error.status,
+          status: ApiConstants.error,
+          item: ApiConstants.screen_health_check,
           id: id,
           version: version,
+          error: error,
+          data: null,
+          errorStatus: error.status,
         });
       });
   });
@@ -303,10 +601,13 @@ const getCollectionPromise = (payload) => {
 // function check() : checks object according to the rules
 // function getHealthReport(): returns the health report object for the given collection (with reduced data.)
 class Collection {
-  healthReport = {};
   constructor(data) {
     this.data = data || null; // data from story
     this.health_check_language = data.health_check_language || null;
+    this.healthReport = {
+      description: '',
+      reportItems: [],
+    };
   }
   check() {
     //TODO: Check current collection against the rules.
@@ -318,6 +619,46 @@ class Collection {
   }
 }
 
+function compareBool(val1 = false, val2 = false) {
+  const bool1 = val1 ? true : false;
+  const bool2 = val2 ? true : false;
+  return bool1 === bool2;
+}
+
+function compareText(text1 = undefined, text2 = undefined) {
+  if (!text1 && !text2) {
+    return true;
+  }
+
+  if (!text1 || !text2) return false;
+
+  return text1.trim() === text2.trim();
+}
+
+function booleanToString(value) {
+  return value ? 'on' : 'off';
+}
+
+//chat GPT
+function haveSameExtension(property1, property2) {
+  const getExtension = (filename) => {
+    const matches = filename.match(/\.([^.]+)$/);
+    return matches ? matches[1].toLowerCase() : '';
+  };
+
+  const ext1 = getExtension(property1);
+  const ext2 = getExtension(property2);
+
+  if (ext1 === ext2) {
+    return null;
+  }
+
+  return {
+    ext1: ext1,
+    ext2: ext2,
+  };
+}
+
 function searchTextArrayInText(targetText, searchStrings, checkType) {
   // returns if it hits a match
   if (!targetText || !searchStrings) return false;
@@ -327,11 +668,11 @@ function searchTextArrayInText(targetText, searchStrings, checkType) {
   switch (checkType) {
     case 'startsWith':
       return searchStrings.some((searchString) =>
-        targetText.startsWith(searchString)
+        targetText.trim().startsWith(searchString.trim())
       );
     case 'includes':
       return searchStrings.some((searchString) =>
-        targetText.includes(searchString)
+        targetText.trim().includes(searchString.trim())
       );
     default:
       return false; // Or throw an error if you prefer
@@ -339,13 +680,23 @@ function searchTextArrayInText(targetText, searchStrings, checkType) {
 }
 
 class Screen {
-  healthReport = {};
-
   constructor(data) {
+    this.appConfig = getConfig();
     this.data = data; //story data
     this.health_check_language = data.health_check_language || null;
-    this.appConfig = getConfig();
+    this.screenViewUrl = this.appConfig.api.screenViewUrl.replace(
+      '{ID}',
+      this.data.id
+    );
+    this.screenEditUrl = this.appConfig.api.screenEditUrl.replace(
+      '{ID}',
+      this.data.id
+    );
     this.story_screen_type = StoryScreenTypes.NOT_IDENTIFIED;
+    this.healthReport = {
+      description: '',
+      reportItems: [],
+    };
 
     const audioGuideRules =
       this.appConfig.screenIdentifiers.rules.audioGuides || null;
@@ -354,14 +705,13 @@ class Screen {
 
     //Must decide what kind of screen is that.
     // 1st check if it is an audio screen.. If not, check if it is an artifact screen
-
-    if ((this.story_screen_type = StoryScreenTypes.NOT_IDENTIFIED)) {
+    if (this.story_screen_type === StoryScreenTypes.NOT_IDENTIFIED) {
       if (audioGuideRules) {
         if (
           searchTextArrayInText(
             data.name,
             audioGuideRules.startWith,
-            'startWith'
+            'startsWith'
           ) &&
           searchTextArrayInText(
             data.name,
@@ -374,13 +724,14 @@ class Screen {
       }
     }
 
-    if ((this.story_screen_type = StoryScreenTypes.NOT_IDENTIFIED)) {
+    // If it is not an audio-guide  screen, check if it is an artifact screen
+    if (this.story_screen_type === StoryScreenTypes.NOT_IDENTIFIED) {
       if (artifactScreenRules) {
         if (
           searchTextArrayInText(
             data.name,
             artifactScreenRules.startWith,
-            'startWith'
+            'startsWith'
           ) &&
           searchTextArrayInText(
             data.name,
@@ -393,72 +744,293 @@ class Screen {
       }
     }
   }
+
+  addHealthCheckError(payload) {
+    console.log('added an error on page:', this.data.id);
+    this.healthReport.reportItems.push(new HealthCheckResult(payload));
+  }
+
   check() {
     // If not audio, then check if it is an artifact screen
 
     if (this.story_screen_type === StoryScreenTypes.ARTIFACT) {
-      // Check if sections
-      // const configContent = th
-      const contentConfig = this.appConfig.feature.checkList.content || null;
-      const currentContentArray = this.data.sections;
-      if (Array.isArray(contentConfig)) {
+      const checkListContent = this.appConfig.feature.checkList.content || null;
+      const currentItemSectionsArr = this.data.sections;
+
+      // check config array once
+
+      if (Array.isArray(checkListContent)) {
         let contentOrderIsGood = true;
 
-        contentConfig.forEach((value, index, arr) => {
+        checkListContent.forEach((value, index) => {
           // check if the order is correct
           const expectedSection = value.for; // 'location' | 'highlights etc
           const settings = value.settings;
-          const currentContentItem = currentContentArray[index];
+          const currentContentItem = currentItemSectionsArr[index];
+          const {
+            screen,
+            titleText,
+            icon,
+            collapsable,
+            descriptionMinimumLength,
+          } = settings;
+          let expectedValue = null;
+          let currentValue = null;
+
+          // console.log('expectedSection', settings);
 
           switch (expectedSection) {
             case 'location':
-              if (
-                currentContentItem &&
-                currentContentItem.section_type === 'link_group'
-              ) {
-                const { screen, titleText, icon } = settings;
+              {
+                const isLinkGroup =
+                  currentContentItem &&
+                  currentContentItem.section_type === 'link_group';
 
-                // check if the location button is addressing self, with proper icons
-                if (screen && screen === 'self') {
-                  if (
-                    this.data.id !== currentContentItem.section_items[0].item_id
-                  ) {
-                    // the button does not address itself. it addresses another page.
-                    // TODO: Create an error
+                const sectionItemCount = currentContentItem.section_items
+                  ? currentContentItem.section_items.length
+                  : -1;
+
+                if (!isLinkGroup) {
+                  // expected something but it is not there.
+                  this.addHealthCheckError({
+                    description: getErrorMessage(
+                      HealthCheckErrorCodes.SECTION_NOT_FOUND,
+                      ['Location Section', index + 1]
+                    ),
+                  });
+                } else if (sectionItemCount !== 1) {
+                  this.addHealthCheckError({
+                    description: getErrorMessage(
+                      HealthCheckErrorCodes.MUST_HAVE_ONE_VALUE,
+                      [
+                        'Location section, buttons:',
+                        'Location Button',
+                        sectionItemCount,
+                      ]
+                    ),
+                  });
+                } else {
+                  //check collapsible
+
+                  expectedValue = collapsable;
+                  // console.log('currentContentItem', currentContentItem);
+                  currentValue = currentContentItem.collapsable;
+
+                  if (!compareBool(expectedValue, currentValue)) {
+                    this.addHealthCheckError({
+                      description: getErrorMessage(
+                        HealthCheckErrorCodes.MUST_BE_A_VALUE,
+                        [
+                          'Location Section Collapsable:',
+                          booleanToString(expectedValue),
+                          booleanToString(currentValue),
+                        ]
+                      ),
+                    });
+                  }
+
+                  if (screen === 'self') {
+                    expectedValue = this.data.id || null;
+                    currentValue = currentContentItem.section_items[0].item_id;
+
+                    if (expectedValue !== currentValue) {
+                      this.addHealthCheckError({
+                        description: getErrorMessage(
+                          HealthCheckErrorCodes.LOCATION_SELF_WRONG
+                        ),
+                      });
+                    }
+                  }
+
+                  expectedValue =
+                    titleText[this.health_check_language] || undefined;
+                  currentValue = currentContentItem.title;
+                  if (!compareText(expectedValue, currentValue)) {
+                    this.addHealthCheckError({
+                      description: getErrorMessage(
+                        HealthCheckErrorCodes.MUST_BE_BLANK,
+                        ['Location Section. Title', currentContentItem.title]
+                      ),
+                    });
                   }
                 }
 
-                const expectedTitle =
+                if (icon) {
+                  let { type = undefined, name = undefined } = icon;
+                  expectedValue = name;
+                  currentValue =
+                    currentContentItem.section_items[0].stock_icon_icon;
+                  if (expectedValue !== currentValue) {
+                    this.addHealthCheckError({
+                      description: getErrorMessage(
+                        HealthCheckErrorCodes.LOCATION_ICON_WRONG,
+                        ['Location Pin Icon', expectedValue, currentValue]
+                      ),
+                    });
+                  }
+
+                  expectedValue = type;
+                  currentValue =
+                    currentContentItem.section_items[0].stock_icon_style;
+                  if (expectedValue !== currentValue) {
+                    this.addHealthCheckError({
+                      description: getErrorMessage(
+                        HealthCheckErrorCodes.LOCATION_ICON_STYLE,
+                        ['Location Pin Style', expectedValue, currentValue]
+                      ),
+                    });
+                  }
+                }
+              }
+              break;
+            case 'highlights':
+              {
+                expectedValue =
                   titleText[this.health_check_language] || undefined;
-                if (expectedTitle !== currentContentItem.title) {
-                  // TODO: Expected title could not found
+
+                currentValue = currentContentItem.title || undefined;
+
+                if (!compareText(expectedValue, currentValue)) {
+                  this.addHealthCheckError({
+                    description: getErrorMessage(
+                      HealthCheckErrorCodes.MUST_BE_A_VALUE,
+                      ['Highlights Section Title:', expectedValue, currentValue]
+                    ),
+                  });
                 }
 
-                if (
-                  icon &&
-                  icon.name &&
-                  icon.name !==
-                    currentContentItem.section_items[0].stock_icon_icon
-                ) {
-                  // TODO: It'is not using the proper icon
+                //check collapsible
+                expectedValue = collapsable;
+                currentValue = currentContentItem.collapsable;
+                if (!compareBool(expectedValue, currentValue)) {
+                  this.addHealthCheckError({
+                    description: getErrorMessage(
+                      HealthCheckErrorCodes.MUST_BE_A_VALUE,
+                      [
+                        'Highlights Section Collapsable',
+                        booleanToString(expectedValue),
+                        booleanToString(currentValue),
+                      ]
+                    ),
+                  });
                 }
-
-                if (
-                  icon &&
-                  icon.type &&
-                  icon.type !==
-                    currentContentItem.section_items[0].stock_icon_style
-                ) {
-                  // TODO: It'is not using the proper icon style
-                }
-              } else {
-                contentOrderIsGood = false;
               }
 
               break;
-            case 'highlights':
-              break;
             case 'image-gallery':
+              {
+                // look for media_group
+                expectedValue = 'media_group';
+                currentValue = currentContentItem.section_type;
+
+                let isMediaGallery = compareText(expectedValue, currentValue);
+                let imageCount = currentContentItem.section_items.length || -1;
+
+                if (!isMediaGallery) {
+                  this.addHealthCheckError({
+                    description: getErrorMessage(
+                      HealthCheckErrorCodes.SECTION_NOT_FOUND,
+                      ['Media Gallery', index + 1]
+                    ),
+                  });
+                } else if (imageCount <= 0) {
+                  this.addHealthCheckError({
+                    description: getErrorMessage(
+                      HealthCheckErrorCodes.EMPTY_GALLERY_FOUND
+                    ),
+                  });
+                } else {
+                  expectedValue = collapsable;
+                  currentValue = currentContentItem.collapsable;
+
+                  if (expectedValue !== currentValue) {
+                    this.addHealthCheckError({
+                      description: getErrorMessage(
+                        HealthCheckErrorCodes.MUST_BE_A_VALUE,
+                        [
+                          'Media Gallery Section Collapsable:',
+                          booleanToString(expectedValue),
+                          booleanToString(currentValue),
+                        ]
+                      ),
+                    });
+                  }
+
+                  // check each image
+                  const images = currentContentItem.section_items;
+                  images.forEach((image) => {
+                    let {
+                      media_type = '',
+                      name = '',
+                      caption = '',
+                      // attribution = '',
+                      description = '',
+                      file = {},
+                    } = image;
+
+                    let { filename = '', file_size = null } = file;
+
+                    name = name.trim();
+                    caption = caption.trim();
+                    // attribution = attribution.trim();
+                    description = description.trim();
+
+                    if (media_type === 'image') {
+                      if (!description) {
+                        this.addHealthCheckError({
+                          severity: HEALTH_CHECK_SEVERITY.HIGH,
+                          description: getErrorMessage(
+                            HealthCheckErrorDescriptions.IMAGE_MISSING_PROPERTY,
+                            ['Description', name, filename]
+                          ),
+                        });
+                      }
+                      if (description && descriptionMinimumLength) {
+                        if (description.length < descriptionMinimumLength) {
+                          this.addHealthCheckError({
+                            severity: HEALTH_CHECK_SEVERITY.HIGH,
+                            description: getErrorMessage(
+                              HealthCheckErrorCodes.IMAGE_DESCRIPTION_TOO_SHORT,
+                              [
+                                descriptionMinimumLength,
+                                description.length,
+                                name,
+                                filename,
+                              ]
+                            ),
+                          });
+                        }
+                      }
+                      if (!caption) {
+                        //missing caption
+                        this.addHealthCheckError({
+                          severity: HEALTH_CHECK_SEVERITY.MEDIUM,
+                          description: getErrorMessage(
+                            HealthCheckErrorCodes.IMAGE_MISSING_PROPERTY,
+                            ['Caption', name, filename]
+                          ),
+                        });
+                      }
+
+                      // Too much extra stuff
+                      const fileExtensionCheck = haveSameExtension(
+                        name,
+                        filename
+                      );
+                      if (fileExtensionCheck) {
+                        const { ext1 = '', ext2 = '' } = fileExtensionCheck;
+                        this.addHealthCheckError({
+                          severity: HEALTH_CHECK_SEVERITY.MEDIUM,
+                          description: getErrorMessage(
+                            HealthCheckErrorCodes.IMAGE_EXTENSION_ERROR,
+                            [ext1, ext2, name, filename]
+                          ),
+                        });
+                      }
+                    }
+                  });
+                }
+              }
               break;
             case 'history':
               break;
@@ -480,34 +1052,11 @@ class Screen {
     }
 
     //check content first
-    const checkListArr = this.appConfig.feature.checkList.content || null;
-    if (checkListArr) {
-      checkListArr.forEach((element) => {
-        const { for: forSection } = element;
-        switch (forSection) {
-          case 'location':
-            // const storySections = this.data.sections.filter((el) => e);
-            break;
-          case 'highlights':
-            break;
-          case 'image-gallery':
-            break;
-          case 'history':
-            break;
-          case 'provenance':
-            break;
-          case 'technical-information':
-            break;
-          case 'airplane-model':
-            break;
-        }
-      });
-    }
   }
 
   getHealthReport() {
     this.healthReport.description = `Health report for ${this.id} and ${this.health_check_language}`;
-    this.healthReport.reportItems = [];
+    // this.healthReport.reportItems = [];
     return this.healthReport;
   }
 }
@@ -528,19 +1077,7 @@ const HEALTH_CHECK_SUGGESTIONS = {
 class HealthCheckResult {
   constructor(data) {
     this.severity = data.severity || HEALTH_CHECK_SEVERITY.LOW;
+    this.description = data.description || 'No error description';
+    this.suggestion = data.suggestion || 'No fix suggestion';
   }
-
-  createHealthCheckResult = (payload) => {
-    const {
-      severity = HEALTH_CHECK_SEVERITY.LOW,
-      description = 'No Description',
-      suggestion = 'No suggestion',
-    } = payload;
-
-    return {
-      severity: severity,
-      description: description,
-      suggestion: suggestion,
-    };
-  };
 }

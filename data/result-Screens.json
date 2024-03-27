@@ -1,0 +1,17 @@
+[
+  {
+    "status": "success",
+    "item": "screen-health-check",
+    "healthReport": {
+      "description": "",
+      "reportItems": []
+    },
+    "error": null,
+    "data": {
+      "empty": true
+    },
+    "storyData": {
+      "empty": true
+    }
+  }
+]

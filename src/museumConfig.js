@@ -21,7 +21,7 @@ const config = {
             for: 'highlights',
             settings: {
               title: 'Highlights:',
-              titleText: { en: 'Highligts:', fr: 'Highlights (FR):' },
+              titleText: { en: 'Highlights:', fr: 'Highlights (FR):' },
               collapsable: false,
             },
           },
@@ -89,6 +89,8 @@ const config = {
     },
     api: {
       baseUrl: 'https://app.mytoursapp.com/api/v3/',
+      screenViewUrl: 'https://aviation.stqry.app/1/story/{ID}',
+      screenEditUrl: 'https://builder.stqry.com/screens/{ID}',
       auth: {
         username: '8919',
         password: 'f313a575-e87e-45b4-88ef-43445071f0da',
@@ -107,7 +109,7 @@ const config = {
     },
     languages: [
       { code: 'en', name: 'English' },
-      { code: 'fr', name: 'French' },
+      // { code: 'fr', name: 'French' },
     ],
   },
   MUSEUM2: {},
