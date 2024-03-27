@@ -2,12 +2,18 @@ import {
   ApiConstants,
   HealthCheckErrorCodes,
   HealthCheckErrorDescriptions,
+  HealthCheckSeverity,
   StoryScreenTypes,
 } from '@/constants/constants';
 import config from '@/museumConfig';
 import { extractTextFromHTML } from '@/utils/api/apiUtils';
 import { writeDataToFile } from '@/utils/devUtils';
-import { getErrorMessage } from '@/utils/utils';
+import {
+  booleanToString,
+  compareBool,
+  compareText,
+  getErrorMessage,
+} from '@/utils/utils';
 import { NextResponse } from 'next/server';
 
 /** GENERAL INFORMATION
@@ -171,18 +177,15 @@ export async function GET(_) {
         }
       } else {
         // issue here
-        // console.log('XXXX');
-        // console.log(screenResult);
+
         return false;
       }
 
       return false;
     });
 
-    // console.log('badScreens.count', badScreens.length);
-
+    // return each bad screen with a key value so the front end can use it
     const badScreenResult = badScreens.map((badScreen) => {
-      // console.log(badScreen);
       const { name = '', title = '' } = badScreen.data.data;
 
       const {
@@ -191,8 +194,6 @@ export async function GET(_) {
         healthReport = {},
         health_check_language,
       } = badScreen.data;
-
-      // console.log('serdar', badScreen.data);
 
       const { id = '', version = '' } = badScreen;
 
@@ -332,7 +333,7 @@ const getScreensHealthCheckPromise = (screens) => {
                     if (value1 && value2 && compareText(value1, value2)) {
                       // add an error to page 1
                       page1.addHealthCheckError({
-                        severity: HEALTH_CHECK_SEVERITY.HIGH,
+                        severity: HealthCheckSeverity.HIGH,
                         description: getErrorMessage(
                           HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
                           [
@@ -345,7 +346,7 @@ const getScreensHealthCheckPromise = (screens) => {
                       });
                       // add an error to page 2
                       page2.addHealthCheckError({
-                        severity: HEALTH_CHECK_SEVERITY.HIGH,
+                        severity: HealthCheckSeverity.HIGH,
                         description: getErrorMessage(
                           HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
                           [
@@ -364,7 +365,7 @@ const getScreensHealthCheckPromise = (screens) => {
                     if (value1 && value2 && compareText(value1, value2)) {
                       // add an error to page 1
                       page1.addHealthCheckError({
-                        severity: HEALTH_CHECK_SEVERITY.HIGH,
+                        severity: HealthCheckSeverity.HIGH,
                         description: getErrorMessage(
                           HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
                           [
@@ -378,7 +379,7 @@ const getScreensHealthCheckPromise = (screens) => {
 
                       // add an error to page 2
                       page2.addHealthCheckError({
-                        severity: HEALTH_CHECK_SEVERITY.HIGH,
+                        severity: HealthCheckSeverity.HIGH,
                         description: getErrorMessage(
                           HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
                           [
@@ -410,7 +411,7 @@ const getScreensHealthCheckPromise = (screens) => {
                           if (section1Element.body === section2Element.body) {
                             // add an error to page 1
                             page1.addHealthCheckError({
-                              severity: HEALTH_CHECK_SEVERITY.HIGH,
+                              severity: HealthCheckSeverity.HIGH,
                               description: getErrorMessage(
                                 HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
                                 [
@@ -423,7 +424,7 @@ const getScreensHealthCheckPromise = (screens) => {
                             });
                             // add an error to page 2
                             page2.addHealthCheckError({
-                              severity: HEALTH_CHECK_SEVERITY.HIGH,
+                              severity: HealthCheckSeverity.HIGH,
                               description: getErrorMessage(
                                 HealthCheckErrorCodes.DUPLICATE_CONTENT_MULTI,
                                 [
@@ -464,7 +465,7 @@ const getScreensHealthCheckPromise = (screens) => {
                                   ) {
                                     // add an error to page 1
                                     page1.addHealthCheckError({
-                                      severity: HEALTH_CHECK_SEVERITY.HIGH,
+                                      severity: HealthCheckSeverity.HIGH,
                                       description: getErrorMessage(
                                         HealthCheckErrorCodes.DUPLICATE_IMAGE_DESCRIPTION_MULTI,
                                         [
@@ -477,7 +478,7 @@ const getScreensHealthCheckPromise = (screens) => {
                                     });
                                     // add an error to page 2
                                     page2.addHealthCheckError({
-                                      severity: HEALTH_CHECK_SEVERITY.HIGH,
+                                      severity: HealthCheckSeverity.HIGH,
                                       description: getErrorMessage(
                                         HealthCheckErrorCodes.DUPLICATE_IMAGE_DESCRIPTION_MULTI,
                                         [
@@ -502,9 +503,6 @@ const getScreensHealthCheckPromise = (screens) => {
             });
           }
 
-          // having all the screen objects, resolve them all.
-          // Note that we could have resolved only the ones with issues, but we don't know if we
-          // are going to check additional stuff after this. So it is better to return it all
           resolve(results);
         })
         .catch(() => {
@@ -516,6 +514,7 @@ const getScreensHealthCheckPromise = (screens) => {
   });
 };
 
+// Returns an object (success or error) for a specific screen and language.
 const getScreenPromise = (payload) => {
   const appConfig = getConfig();
 
@@ -564,7 +563,7 @@ const getScreenPromise = (payload) => {
   });
 };
 
-// Check a collection item
+// TODO: This function is not implemented because our focus is on Screens. Not collections
 const getCollectionPromise = (payload) => {
   const appConfig = getConfig();
 
@@ -630,26 +629,6 @@ class Collection {
   check() {
     //TODO: Check current collection against the rules.
   }
-}
-
-function compareBool(val1 = false, val2 = false) {
-  const bool1 = val1 ? true : false;
-  const bool2 = val2 ? true : false;
-  return bool1 === bool2;
-}
-
-function compareText(text1 = undefined, text2 = undefined) {
-  if (!text1 && !text2) {
-    return true;
-  }
-
-  if (!text1 || !text2) return false;
-
-  return text1.trim() === text2.trim();
-}
-
-function booleanToString(value) {
-  return value ? 'on' : 'off';
 }
 
 //chat GPT
@@ -774,7 +753,7 @@ class Screen {
       const { imageDescriptionMinimumLength } = globalCheckList;
       if (!cover_image) {
         this.addHealthCheckError({
-          severity: HEALTH_CHECK_SEVERITY.HIGH,
+          severity: HealthCheckSeverity.HIGH,
           description: getErrorMessage(
             HealthCheckErrorCodes.MUST_HAVE_A_VALUE,
             ['Header section, Large image']
@@ -785,7 +764,7 @@ class Screen {
         description = extractTextFromHTML(description);
         if (!description) {
           this.addHealthCheckError({
-            severity: HEALTH_CHECK_SEVERITY.HIGH,
+            severity: HealthCheckSeverity.HIGH,
             description: getErrorMessage(
               HealthCheckErrorCodes.MUST_HAVE_A_VALUE,
               ['Header section -> Large image -> Description']
@@ -797,7 +776,7 @@ class Screen {
             description.length < imageDescriptionMinimumLength
           ) {
             this.addHealthCheckError({
-              severity: HEALTH_CHECK_SEVERITY.HIGH,
+              severity: HealthCheckSeverity.HIGH,
               description: getErrorMessage(
                 HealthCheckErrorCodes.IMAGE_DESCRIPTION_TOO_SHORT,
                 [
@@ -835,7 +814,7 @@ class Screen {
             description.length < imageDescriptionMinimumLength
           ) {
             this.addHealthCheckError({
-              severity: HEALTH_CHECK_SEVERITY.HIGH,
+              severity: HealthCheckSeverity.HIGH,
               description: getErrorMessage(
                 HealthCheckErrorCodes.IMAGE_DESCRIPTION_TOO_SHORT,
                 [
@@ -904,7 +883,6 @@ class Screen {
                   //check collapsible
 
                   expectedValue = collapsable;
-                  // console.log('currentContentItem', currentContentItem);
                   currentValue = currentContentItem.collapsable;
 
                   if (!compareBool(expectedValue, currentValue)) {
@@ -1063,7 +1041,7 @@ class Screen {
                       file = {},
                     } = image;
 
-                    let { filename = '', file_size = null } = file;
+                    let { filename = '' } = file;
 
                     name = name.trim();
                     caption = caption.trim();
@@ -1074,7 +1052,7 @@ class Screen {
                     if (media_type === 'image') {
                       if (!description) {
                         this.addHealthCheckError({
-                          severity: HEALTH_CHECK_SEVERITY.HIGH,
+                          severity: HealthCheckSeverity.HIGH,
                           description: getErrorMessage(
                             HealthCheckErrorDescriptions.IMAGE_MISSING_PROPERTY,
                             ['Description', name, filename]
@@ -1084,7 +1062,7 @@ class Screen {
                       if (description && descriptionMinimumLength) {
                         if (description.length < descriptionMinimumLength) {
                           this.addHealthCheckError({
-                            severity: HEALTH_CHECK_SEVERITY.HIGH,
+                            severity: HealthCheckSeverity.HIGH,
                             description: getErrorMessage(
                               HealthCheckErrorCodes.IMAGE_DESCRIPTION_TOO_SHORT,
                               [
@@ -1100,7 +1078,7 @@ class Screen {
                       if (!caption) {
                         //missing caption
                         this.addHealthCheckError({
-                          severity: HEALTH_CHECK_SEVERITY.MEDIUM,
+                          severity: HealthCheckSeverity.MEDIUM,
                           description: getErrorMessage(
                             HealthCheckErrorCodes.IMAGE_MISSING_PROPERTY,
                             ['Caption', name, filename]
@@ -1116,7 +1094,7 @@ class Screen {
                       if (fileExtensionCheck) {
                         const { ext1 = '', ext2 = '' } = fileExtensionCheck;
                         this.addHealthCheckError({
-                          severity: HEALTH_CHECK_SEVERITY.MEDIUM,
+                          severity: HealthCheckSeverity.MEDIUM,
                           description: getErrorMessage(
                             HealthCheckErrorCodes.IMAGE_EXTENSION_ERROR,
                             [ext1, ext2, name, filename]
@@ -1129,12 +1107,16 @@ class Screen {
               }
               break;
             case 'history':
+              //TODO:
               break;
             case 'provenance':
+              //TODO:
               break;
             case 'technical-information':
+              //TODO:
               break;
             case 'airplane-model':
+              //TODO:
               break;
           }
         });
@@ -1153,16 +1135,10 @@ class Screen {
   }
 }
 
-const HEALTH_CHECK_SEVERITY = {
-  LOW: 'low',
-  MEDIUM: 'medium',
-  HIGH: 'high',
-};
-
 class HealthCheckResult {
   constructor(data) {
-    this.severity = data.severity || HEALTH_CHECK_SEVERITY.LOW;
-    this.description = data.description || 'No error description';
-    this.suggestion = data.suggestion || 'No fix suggestion';
+    this.severity = data.severity || HealthCheckSeverity.LOW;
+    this.description = data.description || '';
+    this.suggestion = data.suggestion || '';
   }
 }

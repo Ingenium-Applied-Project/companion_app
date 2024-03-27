@@ -60,7 +60,7 @@ const HealthCheckErrorDescriptions = {
   LOCATION_ICON_STYLE:
     '{1}: Location pin icon style is wrong. Expected {2}; found: {3}',
   EMPTY_GALLERY_FOUND: 'Gallery is empty. ',
-  IMAGE_MISSING_PROPERTY: 'Missing %{1} on image {2} {3}',
+  IMAGE_MISSING_PROPERTY: 'Missing {1} on image {2} {3}',
   IMAGE_DESCRIPTION_TOO_SHORT:
     'Image description is too short. Expected minimum {1} but found {2} on image {3}{4}',
   IMAGE_EXTENSION_ERROR:
@@ -71,12 +71,19 @@ const HealthCheckErrorDescriptions = {
     'Duplicate image descriptions on screen {1}: Check image {2} for languages {3} and {4}.',
 };
 
+const HealthCheckSeverity = {
+  LOW: 'low',
+  MEDIUM: 'medium',
+  HIGH: 'high',
+};
+
 const HealthCheckSuggestions = {};
 
 export {
   ApiConstants,
   HealthCheckErrorCodes,
   HealthCheckErrorDescriptions,
+  HealthCheckSeverity,
   HealthCheckSuggestions,
   HeroImageDefaultsCASM,
   LocalStorageKeys,
