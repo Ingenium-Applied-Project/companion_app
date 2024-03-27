@@ -189,6 +189,7 @@ export async function GET(_) {
         screenViewUrl = '',
         screenEditUrl = '',
         healthReport = {},
+        health_check_language,
       } = badScreen.data;
 
       // console.log('serdar', badScreen.data);
@@ -196,6 +197,7 @@ export async function GET(_) {
       const { id = '', version = '' } = badScreen;
 
       return {
+        key: `${id}-${health_check_language}`,
         id: id,
         version: version,
         name: name,
@@ -759,6 +761,7 @@ class Screen {
   }
 
   addHealthCheckError(payload) {
+    payload.key = this.healthReport.reportItems.length + 1;
     this.healthReport.reportItems.push(new HealthCheckResult(payload));
   }
 

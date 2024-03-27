@@ -2,6 +2,7 @@
 
 import { useApp } from '@/providers/appProvider';
 import React, { useEffect, useState } from 'react';
+import SystemHealthCheckListItem from '../SystemHealthCheckListItem/SystemHealthCheckListItem';
 import styles from './SystemHealthCheck.module.css';
 
 const SystemHealthCheck = () => {
@@ -35,9 +36,16 @@ const SystemHealthCheck = () => {
         {!systemHealthCheckRunning && 'Run System health check'}
         {systemHealthCheckRunning && 'System health check running'}
       </button>
+      <div>
+        {systemHealthCheckData &&
+          Array.isArray(systemHealthCheckData) &&
+          systemHealthCheckData.map((data) => {
+            return <SystemHealthCheckListItem key={data.key} data={data} />;
+          })}
+      </div>
       <div></div>
       <div>
-        {formattedJSON && (
+        {formattedJSON && 1 === 1 && (
           <textarea
             className={styles.textarea}
             value={formattedJSON}

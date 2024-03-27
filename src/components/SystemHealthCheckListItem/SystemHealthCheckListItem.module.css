@@ -1,0 +1,90 @@
+.container {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto;
+  column-gap: 1rem;
+  border: 1px solid black;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.value {
+  font-weight: normal;
+}
+
+.screenNameLabel,
+.screenTitleLabel,
+.screenViewUrlLabel,
+.screenEditUrlLabel,
+.screenProblemLabel {
+  grid-column: 1;
+}
+
+.screenNameValue,
+.screenTitleValue,
+.screenViewUrlValue,
+.screenEditUrlValue,
+.screenProblemValue {
+  grid-column: 2;
+}
+
+.screenNameLabel {
+  grid-row: 1;
+}
+
+.screenNameValue {
+  grid-row: 1;
+}
+
+.screenTitleLabel {
+  grid-row: 2;
+}
+
+.screenTitleValue {
+  grid-row: 2;
+}
+
+.screenViewUrlLabel {
+  grid-row: 3;
+}
+
+.screenViewUrlValue {
+  grid-row: 3;
+}
+
+.screenEditUrlLabel {
+  grid-row: 4;
+}
+
+.screenEditUrlValue {
+  grid-row: 4;
+}
+
+.screenProblemLabel {
+  grid-row: 5;
+}
+
+.screenProblemValue {
+  grid-row: 5;
+  grid-column: 2;
+
+  list-style-type: disc;
+  padding-left: 1rem;
+}
+
+.a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.a:hover {
+  text-decoration: underline;
+}
+
+.li {
+  margin-bottom: 0.5rem;
+}
