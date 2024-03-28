@@ -1,91 +1,105 @@
 .container {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
   margin: 20px;
 }
 
-.textInputContainer {
+.uploadContainer {
   display: flex;
-  grid-column: 1 / -1;
+  flex-direction: column;
+  width: 100%;
+}
+
+.title {
+  background-color: var(--second-color-background);
+  width: 100%;
+  padding: 1rem;
+  height: 2.5rem;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  border-radius: 0.75rem;
+  -webkit-border-radius: 0.75rem;
+  -moz-border-radius: 0.75rem;
+  -ms-border-radius: 0.75rem;
+  -o-border-radius: 0.75rem;
+  color: var(--primary-text-color);
+  font-weight: bold;
+  grid-area: header;
 }
 
 /* Styles for the text input */
 .textInput {
   width: 100%;
-  padding: 8px;
-  margin-top: 5px;
+  margin-bottom: 1rem;
+  height: 2.25rem;
+  margin-top: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
+  grid-area: controls;
+  padding: 0.5rem;
 }
 
+/* Styles for the Upload Button */
 .uploadButtonContainer {
   display: flex;
+  justify-content: center;
+  align-content: center;
+  grid-area: image;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.uploadButtonContainer input::file-selector-button {
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 0.75rem;
+  font-weight: bold;
+  text-align: center;
+  grid-area: image;
+  background-color: var(--background-button);
+  width: 100%;
+  height: 2.25rem;
+  color: var(--background);
 }
 
 .imageContainer {
-  position: relative;
-  display: 'inline-block';
-}
-
-@media only screen and (min-width: 45em) {
-  .container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* align-items: flex-start; */
-    /* justify-content: center; */
-    margin: 20px;
-  }
-  .textInputContainer {
-    display: flex;
-    grid-row: 1 / 2;
-    grid-column: 1 / -1;
-  }
-
-  .uploadButtonContainer {
-    grid-row: 2 / 3;
-    grid-column: 1 / -1;
-  }
-
-  .originalImageContainer {
-    grid-row: 3 / 4;
-    grid-column: 1 / 2;
-  }
-
-  .modifiedImageContainer {
-    grid-row: 3 / 4;
-    grid-column: 2 / 3;
-  }
-}
-
-.sourceContainer {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 20px;
+  width: 100%;
+  grid-area: file;
+  margin-top: 2rem;
+  justify-content: center;
 }
 
 /* Styles for the file input */
+
 .fileInput {
-  margin-top: 10px;
-}
-
-/* Styles for the modified image container */
-.modifiedImageContainerxx {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: inline-block;
+  cursor: pointer;
   width: 100%;
+  height: 3rem;
+  border-radius: 0.75rem;
+  -webkit-border-radius: 0.75rem;
+  -moz-border-radius: 0.75rem;
+  -ms-border-radius: 0.75rem;
+  -o-border-radius: 0.75rem;
+  font-weight: bold;
+  grid-area: image;
 }
-
 /* Styles for the filters container */
 .filtersContainer {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
   width: 100%;
-  margin-bottom: 20px;
+  margin: 1rem;
+  grid-area: controls;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  justify-content: center;
+  /* align-items: center; */
 }
 
 /* Styles for the modified image */
@@ -102,28 +116,12 @@
   font-size: 1.28rem;
 }
 
-/* Styles for the title */
-.title2 {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  color: #ffffff;
-  font-size: 1.3125rem;
-  line-height: 1.11;
-  letter-spacing: -0.01111111em;
-  padding: 10px;
-}
-
-.downloadButton:hover {
-  background-color: #0056b3;
-}
-
 /* Styles for the sliders */
 .rangeInput {
   -webkit-appearance: none;
   width: 100%;
   height: 8px;
-  background: #e1e1e1;
+  background: var(--second-color-background);
   border-radius: 5px;
   outline: none;
   padding: 0;
@@ -133,35 +131,26 @@
 .rangeInput::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #007bff;
+  width: 1rem;
+  height: 1rem;
+  background: var(--secondary-color);
   border-radius: 50%;
   cursor: pointer;
 }
 
 .rangeInput::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #007bff;
+  width: 1rem;
+  height: 1rem;
+  background: var(--secondary-color);
   border-radius: 50%;
   cursor: pointer;
 }
 
 .rangeInput::-ms-thumb {
-  width: 16px;
-  height: 16px;
-  background: #007bff;
+  width: 1rem;
+  height: 1rem;
+  background: var(--secondary-color);
   border-radius: 50%;
-  cursor: pointer;
-}
-
-/* Styles for the color picker */
-.colorInput {
-  border: none;
-  border-radius: 5px;
-  height: 32px;
-  width: 60px;
   cursor: pointer;
 }
 
@@ -169,30 +158,68 @@
 .label {
   display: block;
   margin-bottom: 5px;
-  color: #333;
+  color: var(--primary-text-color);
   font-weight: 500;
 }
 
-/* Styles for each filter container */
-.filtersContainer > div {
-  margin-bottom: 20px;
+/* Styles for the buttons */
+.button {
+  background-color: var(--background-button);
+  color: var(--background);
+  width: 100%;
+  height: 2rem;
+  border-radius: 0.5rem;
+  -webkit-border-radius: 0.5rem;
+  -moz-border-radius: 0.5rem;
+  -ms-border-radius: 0.5rem;
+  -o-border-radius: 0.5rem;
 }
 
-.colorPreview {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #ccc;
-  cursor: pointer;
+.removeButton {
+  border: none;
+  background-color: var(--background);
+  text-align: right;
+  text-decoration: underline;
+  font-weight: lighter;
 }
 
-.colorPickerOverlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-  background: white;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.checkboxSizesContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem;
+}
+
+.checkboxSizesContainer input {
+  margin-right: 1rem;
+}
+
+@media only screen and (min-width: 50em) {
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-areas:
+      'header header header header'
+      'file file controls controls'
+      'image image controls controls'
+      'footer footer footer footer';
+    align-items: flex-start;
+  }
+
+  .title {
+    grid-area: header;
+  }
+  .textInput {
+    grid-area: controls;
+  }
+
+  .uploadButtonContainer {
+    grid-area: image;
+  }
+  .imageContainer {
+    grid-area: file;
+  }
 }

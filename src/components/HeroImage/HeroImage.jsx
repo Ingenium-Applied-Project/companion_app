@@ -37,98 +37,85 @@ const HeroImage = () => {
 
   return (
     <div className={styles.container}>
-      {/* Text Input where user enters the screen-title */}
-      <div className={styles.textInputContainer}>
+      <div className={styles.title}>
+        <p>Hero Image</p>
+      </div>
+
+      <div className={styles.imageContainer}>
+        <img src={modifiedHeroImage} alt="Modified" className={styles.image} />
+      </div>
+
+      <div className={styles.uploadButtonContainer}>
         <input
+          type="file"
+          onChange={handleHeroImageUpload}
+          accept="image/*"
+          id="file-upload"
+          className={styles.fileInput}
+        />
+      </div>
+
+      {/* Filters */}
+      <div className={styles.filtersContainer}>
+        <button
+          title="remove"
+          onClick={handleRemoveImage}
+          className={styles.removeButton}
+        >
+          Reset
+        </button>
+        {/* <input
           type="text"
           value={heroImageText}
           onChange={handleTextChange}
           className={styles.textInput}
-        />
-      </div>
-
-      {/* Upload Button */}
-      <div>
-        <div className={styles.uploadButtonContainer}>
-          {heroImage && (
-            <button
-              title="test"
-              className={styles.fileInput}
-              onClick={handleRemoveImage}
-            >
-              Remove Image
-            </button>
-          )}
+          placeholder="Write the title..."
+        /> */}
+        <div>
+          <label className={styles.label}>Gradient Start Height Pct:</label>
           <input
-            type="file"
-            onChange={handleHeroImageUpload}
-            accept="image/*"
-            className={styles.fileInput}
-            title="Upload Hero Image"
+            type="range"
+            name="gradientStartHeight"
+            min="0"
+            max="100"
+            value={heroImageFilters.gradientStartHeight * 100}
+            onChange={handleFilterChange}
+            className={styles.rangeInput}
           />
         </div>
-      </div>
-      <div className={styles.originalImageContainer}>
-        {heroImage && (
-          <div className={styles.imageContainer}>
-            <img
-              src={heroImage}
-              alt="Original Hero Image"
-              className={styles.image}
-            />
-            <h2 className={styles.title2}>{heroImageText}</h2>
-          </div>
-        )}
-      </div>
-      <div className={styles.modifiedImageContainer}>
-        {modifiedHeroImage && (
-          <div>
-            <div className={styles.imageContainer}>
-              <img
-                src={modifiedHeroImage}
-                alt="Modified"
-                className={styles.image}
-              />
-              <h2 className={styles.title2}>{heroImageText}</h2>
-            </div>
-            <div>
-              <button onClick={downloadModifiedHeroImage}>Download</button>
-            </div>
 
-            <div>
-              <p className={styles.title}> Step 3 Adjust Settings</p>
+        <div>
+          <label className={styles.label}>Export Quality:</label>
+          <input
+            type="range"
+            name="exportQuality"
+            min="0"
+            max="3"
+            step="1"
+            value={heroImageFilters.exportQuality}
+            onChange={handleFilterChange}
+            className={styles.rangeInput}
+          />
+        </div>
+        {/* Check box Sizes */}
+        <div className={styles.checkboxSizesContainer}>
+          <label className={styles.label}>
+            <input type="checkbox" id="checkbox1" value="small" />
+            Small
+          </label>
+          <label className={styles.label}>
+            <input type="checkbox" id="checkbox1" value="medium" />
+            Medium
+          </label>
+          <label className={styles.label}>
+            <input type="checkbox" id="checkbox1" value="large" />
+            Large
+          </label>
+        </div>
 
-              <div>
-                <label className={styles.label}>
-                  Gradient Start Height Pct:
-                </label>
-                <input
-                  type="range"
-                  name="gradientStartHeight"
-                  min="0"
-                  max="100"
-                  value={heroImageFilters.gradientStartHeight * 100}
-                  onChange={handleFilterChange}
-                  className={styles.rangeInput}
-                />
-              </div>
-
-              <div>
-                <label className={styles.label}>Export Quality:</label>
-                <input
-                  type="range"
-                  name="exportQuality"
-                  min="0"
-                  max="3"
-                  step="1"
-                  value={heroImageFilters.exportQuality}
-                  onChange={handleFilterChange}
-                  className={styles.rangeInput}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        <button onClick={downloadModifiedHeroImage} className={styles.button}>
+          Download
+        </button>
       </div>
     </div>
   );

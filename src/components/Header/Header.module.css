@@ -2,10 +2,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #012860;
-  color: rgb(var(--primary-glow));
+  background-color: var(--background);
   padding: 1rem;
-  border-bottom: 5px solid #a8c8ef;
+  width: 100%;
 }
 
 .logo {
@@ -18,14 +17,4 @@
   font-weight: bold;
   color: rgb(var(--primary-glow));
   text-decoration: none;
-}
-
-.links a {
-  margin: 0 0.5rem 0 0.5rem;
-  color: #fff;
-  text-decoration: none;
-}
-
-.links a:hover {
-  text-decoration: underline;
 }

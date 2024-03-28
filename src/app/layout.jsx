@@ -14,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`grid ${inter.className}`}>
+      <body>
         <Providers>
           <Header />
           <main className="container">{children}</main>

@@ -4,27 +4,9 @@
   padding: 0 1rem;
 }
 
-.main {
+/* .main {
   display: flex;
   flex-direction: column;
   padding: 6rem;
   min-height: 100vh;
-}
-
-.link {
-  color: blue;
-  text-decoration: underline;
-}
-
-.link:hover {
-  color: purple;
-}
-
-@media (prefers-color-scheme: dark) {
-  .link {
-    color: lightskyblue;
-  }
-  .link:hover {
-    color: lightcoral;
-  }
-}
+} */

@@ -9,7 +9,7 @@ const Header = () => {
         <div className={styles.logo}>
           <Link href="/">
             <Image
-              src="/inSYNC_logo_transparent.png"
+              src="/ingenium_logo.png"
               alt="inSync Logo"
               style={{
                 width: 'auto',
@@ -20,11 +20,11 @@ const Header = () => {
             />
           </Link>
         </div>
-        <div className={styles.links}>
+        {/* <div className={styles.links}>
           <Link href="/about">About</Link>
           <Link href="/about/team">Our Team</Link>
           <Link href="/code/repos">Code</Link>
-        </div>
+        </div> */}
       </div>
     </header>
   );
