@@ -42,7 +42,7 @@ const HeroImage = () => {
       </div>
 
       <div className={styles.imageContainer}>
-        <img src={modifiedHeroImage} alt="Modified" className={styles.image} />
+        <img src={modifiedHeroImage} alt="Image" className={styles.image} />
       </div>
 
       <div className={styles.uploadButtonContainer}>

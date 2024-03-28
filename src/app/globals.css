@@ -90,11 +90,17 @@ body {
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
+  color: rgb(var(--primary-text-color));
   background: var(--background);
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+ul {
+  color: var(--primary-text-color);
+}
+input {
+  border: none;
 }
